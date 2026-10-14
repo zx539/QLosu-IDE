@@ -22,7 +22,7 @@
     rightTab: 'circuit',
     lastTrace: null,
     chatHistory: [],
-    agentConfig: JSON.parse(localStorage.getItem('qlosu_agent') || 'null'),
+    aiAssistant: null,
   };
 
   let editor;
@@ -328,6 +328,237 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
+  // ---------- AI 助手 ----------
+  async function sendAIMessage() {
+    const input = els.composer.value.trim();
+    if (!input) return;
+
+    if (!state.aiAssistant) {
+      state.aiAssistant = new AIAssistant();
+    }
+
+    els.composer.value = '';
+    els.composer.disabled = true;
+
+    // 添加用户消息
+    addChatMessage('user', input);
+
+    // 构建上下文
+    const context = {};
+    if (els.agentContext.checked && state.activeTab) {
+      context.code = state.activeTab.code;
+      const selection = editor.getModel()?.getValueInRange(editor.getSelection());
+      if (selection) context.selection = selection;
+    }
+    if (state.lastTrace?.errors?.length) {
+      context.error = state.lastTrace.errors.map(e => `第 ${e.line} 行: ${e.message}`).join('\n');
+    }
+
+    // 显示思考中
+    const thinkingId = addChatMessage('assistant', '思考中...');
+    const statusEl = document.getElementById('ai-status');
+    statusEl.textContent = '正在生成回复...';
+
+    try {
+      let fullResponse = '';
+      const msgEl = document.querySelector(`[data-msg-id="${thinkingId}"]`);
+
+      for await (const chunk of state.aiAssistant.streamChat(input, context)) {
+        if (chunk.type === 'text') {
+          fullResponse += chunk.content;
+          if (msgEl) msgEl.innerHTML = marked.parse(fullResponse);
+        }
+      }
+
+      state.aiAssistant.addToHistory('user', input);
+      state.aiAssistant.addToHistory('assistant', fullResponse);
+      statusEl.textContent = '';
+    } catch (error) {
+      const msgEl = document.querySelector(`[data-msg-id="${thinkingId}"]`);
+      if (msgEl) {
+        msgEl.innerHTML = `<div class="chat-error">❌ 错误: ${esc(error.message)}\n\n请检查 AI 配置（点击右上角设置图标）</div>`;
+      }
+      statusEl.textContent = '';
+    } finally {
+      els.composer.disabled = false;
+      els.composer.focus();
+    }
+  }
+
+  function sendAIPrompt(prompt) {
+    els.composer.value = prompt;
+    sendAIMessage();
+  }
+
+  function clearAIChat() {
+    if (!confirm('确定清空对话历史？')) return;
+    els.chat.innerHTML = '<div class="chat-welcome"><p>对话已清空</p></div>';
+    state.chatHistory = [];
+    if (state.aiAssistant) state.aiAssistant.clearHistory();
+  }
+
+  function addChatMessage(role, content) {
+    const id = `msg-${Date.now()}-${Math.random()}`;
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg ${role}`;
+    msgDiv.setAttribute('data-msg-id', id);
+
+    if (role === 'user') {
+      msgDiv.textContent = content;
+    } else {
+      msgDiv.innerHTML = typeof marked !== 'undefined' ? marked.parse(content) : esc(content);
+    }
+
+    // 移除欢迎消息
+    const welcome = els.chat.querySelector('.chat-welcome');
+    if (welcome) welcome.remove();
+
+    els.chat.appendChild(msgDiv);
+    els.chat.scrollTop = els.chat.scrollHeight;
+
+    return id;
+  }
+
+  function openAISettings() {
+    const config = state.aiAssistant?.config || new AIAssistant().loadConfig();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-mask';
+    modal.innerHTML = `
+      <div class="modal">
+        <div class="modal-head">
+          AI 助手配置
+          <div class="spacer"></div>
+          <button class="icon-btn" onclick="this.closest('.modal-mask').remove()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-row">
+            <label>AI 提供商</label>
+            <select class="input" id="ai-provider">
+              <option value="ollama" ${config.provider === 'ollama' ? 'selected' : ''}>Ollama (本地)</option>
+              <option value="openai" ${config.provider === 'openai' ? 'selected' : ''}>OpenAI</option>
+              <option value="anthropic" ${config.provider === 'anthropic' ? 'selected' : ''}>Anthropic Claude</option>
+            </select>
+          </div>
+          <div class="form-hint">推荐使用 Ollama 本地运行，无需 API Key</div>
+
+          <div id="ollama-config" style="${config.provider === 'ollama' ? '' : 'display:none'}">
+            <div class="form-row">
+              <label>Ollama 地址</label>
+              <input class="input" id="ollama-url" value="${esc(config.ollama.baseURL)}">
+            </div>
+            <div class="form-row">
+              <label>模型</label>
+              <input class="input" id="ollama-model" value="${esc(config.ollama.model)}">
+            </div>
+            <div class="form-hint">推荐模型：qwen2.5-coder:7b, deepseek-coder-v2</div>
+          </div>
+
+          <div id="openai-config" style="${config.provider === 'openai' ? '' : 'display:none'}">
+            <div class="form-row">
+              <label>API Key</label>
+              <input class="input" type="password" id="openai-key" value="${esc(config.openai.apiKey)}">
+            </div>
+            <div class="form-row">
+              <label>API 地址</label>
+              <input class="input" id="openai-url" value="${esc(config.openai.baseURL)}">
+            </div>
+            <div class="form-row">
+              <label>模型</label>
+              <input class="input" id="openai-model" value="${esc(config.openai.model)}">
+            </div>
+          </div>
+
+          <div id="anthropic-config" style="${config.provider === 'anthropic' ? '' : 'display:none'}">
+            <div class="form-row">
+              <label>API Key</label>
+              <input class="input" type="password" id="anthropic-key" value="${esc(config.anthropic.apiKey)}">
+            </div>
+            <div class="form-row">
+              <label>模型</label>
+              <input class="input" id="anthropic-model" value="${esc(config.anthropic.model)}">
+            </div>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button class="btn" onclick="this.closest('.modal-mask').remove()">取消</button>
+          <button class="btn primary" onclick="app.saveAIConfig()">保存</button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 切换提供商时显示对应配置
+    modal.querySelector('#ai-provider').onchange = (e) => {
+      modal.querySelector('#ollama-config').style.display = e.target.value === 'ollama' ? '' : 'none';
+      modal.querySelector('#openai-config').style.display = e.target.value === 'openai' ? '' : 'none';
+      modal.querySelector('#anthropic-config').style.display = e.target.value === 'anthropic' ? '' : 'none';
+    };
+  }
+
+  function saveAIConfig() {
+    const modal = document.querySelector('.modal-mask');
+    const provider = modal.querySelector('#ai-provider').value;
+
+    const config = {
+      provider,
+      ollama: {
+        baseURL: modal.querySelector('#ollama-url').value,
+        model: modal.querySelector('#ollama-model').value,
+      },
+      openai: {
+        apiKey: modal.querySelector('#openai-key').value,
+        baseURL: modal.querySelector('#openai-url').value,
+        model: modal.querySelector('#openai-model').value,
+      },
+      anthropic: {
+        apiKey: modal.querySelector('#anthropic-key').value,
+        model: modal.querySelector('#anthropic-model').value,
+      },
+    };
+
+    if (!state.aiAssistant) state.aiAssistant = new AIAssistant();
+    state.aiAssistant.saveConfig(config);
+
+    toast('AI 配置已保存');
+    modal.remove();
+  }
+
+  // ---------- 本地文件打开 ----------
+  async function openLocalFile() {
+    if (typeof window.electronAPI !== 'undefined') {
+      const file = await window.electronAPI.openFile();
+      if (file) {
+        openTab({ type: 'local', path: file.path, name: file.name, code: file.content });
+      }
+    } else {
+      // Web 模式：使用 <input type="file">
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.losu,.txt';
+      input.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const content = await file.text();
+          openTab({ type: 'local', path: file.name, name: file.name, code: content });
+        }
+      };
+      input.click();
+    }
+  }
+
+  async function openLocalFolder() {
+    if (typeof window.electronAPI !== 'undefined') {
+      const folder = await window.electronAPI.openFolder();
+      if (folder) {
+        toast('文件夹打开功能开发中', 'warn');
+      }
+    } else {
+      toast('Web 模式不支持打开文件夹，请使用桌面版', 'warn');
+    }
+  }
+
   // ---------- 初始化 ----------
   async function init() {
     applyTheme(state.theme);
@@ -353,7 +584,21 @@
           string_single: [[/[^\\']+/, 'string'], [/\\./, 'string.escape'], [/'/, 'string', '@pop']],
         },
       });
-      editor = monaco.editor.create(els.editorHost, { theme: state.theme === 'light' ? 'vs' : 'vs-dark', fontSize: 13, minimap: { enabled: false }, lineNumbers: 'on', glyphMargin: true });
+      editor = monaco.editor.create(els.editorHost, {
+        theme: state.theme === 'light' ? 'vs' : 'vs-dark',
+        fontSize: 13,
+        minimap: { enabled: true },
+        lineNumbers: 'on',
+        glyphMargin: true,
+        automaticLayout: true,
+        scrollBeyondLastLine: false,
+        renderWhitespace: 'selection',
+        cursorBlinking: 'smooth',
+        cursorSmoothCaretAnimation: 'on',
+        smoothScrolling: true,
+        tabSize: 2,
+        quickSuggestions: false,
+      });
       editor.onDidChangeCursorPosition((e) => {
         els.sbPos.textContent = `第 ${e.position.lineNumber} 行 ${e.position.column} 列`;
       });
@@ -366,7 +611,27 @@
   }
 
   // ---------- 对外接口 ----------
-  window.app = { init, run, saveFile, openExample, openFile, closeTabByPath: (p) => closeTab(state.tabs.find((t) => t.path === p)), switchView, switchPanelTab, switchRightTab, applyTheme, refreshDiagram };
+  window.app = {
+    init,
+    run,
+    saveFile,
+    openExample,
+    openFile,
+    openLocalFile,
+    openLocalFolder,
+    openTab,
+    closeTabByPath: (p) => closeTab(state.tabs.find((t) => t.path === p)),
+    switchView,
+    switchPanelTab,
+    switchRightTab,
+    applyTheme,
+    refreshDiagram,
+    sendAIMessage,
+    sendAIPrompt,
+    clearAIChat,
+    openAISettings,
+    saveAIConfig,
+  };
   window.addEventListener('DOMContentLoaded', init);
 
   els.stepRange.oninput = () => updateStep(Number(els.stepRange.value));

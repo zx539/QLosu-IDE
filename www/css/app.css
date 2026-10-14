@@ -352,10 +352,35 @@ select.input:focus, input.input:focus, textarea.input:focus { border-color: var(
 .rtoolbar { display: flex; align-items: center; gap: 4px; padding: 6px 8px; border-bottom: 1px solid var(--border); flex-wrap: wrap; flex: none; }
 .rtoolbar .label { color: var(--text-3); font-size: 12px; margin-right: 4px; }
 
-.diagram-host { flex: 1; overflow: auto; background: var(--bg); position: relative; }
-.diagram-host .geDiagramContainer, .diagram-host .mxgraph { background: transparent !important; }
+.diagram-host {
+  flex: 1;
+  overflow: auto;
+  background: var(--bg);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+.diagram-host .mxgraph {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto;
+}
+.diagram-host .geDiagramContainer,
+.diagram-host .mxgraph {
+  background: transparent !important;
+}
+.diagram-empty {
+  color: var(--text-dim);
+  font-size: 13px;
+  text-align: center;
+  padding: 60px 20px;
+}
 [data-theme="dark"] .diagram-host .mxgraph svg,
-[data-theme="aurora"] .diagram-host .mxgraph svg { filter: none; }
+[data-theme="aurora"] .diagram-host .mxgraph svg {
+  filter: none;
+}
 .diagram-empty { padding: 28px 20px; color: var(--text-3); text-align: center; line-height: 1.8; }
 
 .stepper { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-top: 1px solid var(--border); flex: none; }

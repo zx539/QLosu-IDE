@@ -5,8 +5,9 @@
  * 创建 BrowserWindow 加载 http://127.0.0.1:PORT/。
  * 窗口关闭时同步关闭服务。
  */
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { startServer } = require('../server/app');
 
 let mainWindow;
@@ -27,12 +28,36 @@ async function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: true,
+      preload: path.join(__dirname, 'preload.js'),
     },
     icon: path.join(__dirname, '../www/icon.png'),
   });
 
   mainWindow.loadURL(url);
   mainWindow.on('closed', () => { mainWindow = null; });
+
+  // 文件对话框
+  ipcMain.handle('dialog:openFile', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openFile'],
+      filters: [
+        { name: 'Losu 文件', extensions: ['losu'] },
+        { name: '所有文件', extensions: ['*'] },
+      ],
+    });
+    if (result.canceled || !result.filePaths.length) return null;
+    const filePath = result.filePaths[0];
+    const content = fs.readFileSync(filePath, 'utf8');
+    return { path: filePath, name: path.basename(filePath), content };
+  });
+
+  ipcMain.handle('dialog:openFolder', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+      properties: ['openDirectory'],
+    });
+    if (result.canceled || !result.filePaths.length) return null;
+    return result.filePaths[0];
+  });
 }
 
 app.whenReady().then(createWindow);
