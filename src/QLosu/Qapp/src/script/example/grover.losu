@@ -1,0 +1,57 @@
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var {
+  Hadamard: H,
+  PauliX: X,
+  PauliZ: Z,
+  ControlledPauliX: CNOT,
+  Toffoli
+} import qufu.Gates;
+var {
+  Measure: M
+} import qufu;
+
+
+/*
+ * Grover 门: [2] ->([1]) -> [2] 进行一次 Grover 迭代
+ * 输入端: 2 比特量子线路
+ * 输出端: 2 比特量子线路
+ * 控制端: 1 比特量子线路
+ * */
+var grover = { ctrl =>{
+  input =>
+    ctrl -> `Unit<QuReg<Wire[1]>>`;
+    input -> `Unit<QuReg<Wire[2]>>`;
+  var wire0 = input[[0]];
+  var wire1 = input[[1]];
+  // 对控制位应用 PauliX 与 Hadamard 门
+  ctrl :> (X() ~>H());
+
+  wire0 :> H(); wire1 :> H();
+
+  // oracle 操作
+  ctrl :> Toffoli(input);
+
+  wire0 :> H();
+  wire1 :> H();
+
+  // 条件相位偏移 2|00><00|-I
+  wire0 :> X(); wire1 :> (X() ~>H() ~>CNOT(wire0) ~>H());
+  wire0 :> X(); wire1 :> X();
+
+  // 再次应用 H 门
+  wire0 :> H(); wire1 :> H(); ctrl :> H();
+
+  input
+}};
+
+
+var main = {
+  var reg = QuReg(3);
+  var out = reg[[0,1]] :> grover(reg[[2]]);
+  println(M(out[[0]]), M(out[[1]]));
+};
+
+return {;
+  main
+}

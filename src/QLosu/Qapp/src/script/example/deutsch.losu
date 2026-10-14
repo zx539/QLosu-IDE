@@ -1,0 +1,78 @@
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var {
+  Hadamard: H,
+  PauliX: X,
+  PauliZ: Z,
+  ControlledPauliX: CNOT,
+  Toffoli
+} import qufu.Gates;
+var {
+  Measure: M
+} import qufu;
+
+/*
+ * oracle 门: [1] ->([1], lam) -> [1], 应用 oracle 函数
+ * 输入端: 1 比特量子电路
+ * 输出端: 1 比特量子电路
+ * 控制端: 1 比特量子电路, lam: oracle 函数实现，可以为常函数或平衡函数
+ *        lam 可选: const_0 const_1 balanced balanced_not
+ * */
+var oracle = { ctrl, lam =>{
+  input =>
+    ctrl  -> `Unit<QuReg<Wire[1]>>`;
+    lam   -> `Meta`;
+    input -> `Unit<QuReg<Wire[1]>>`;
+  println("----oracle 0----");
+  $(reportQureg)(input::['handle']);
+  if(lam == 'const_1'){
+    input :> X;
+  }else if(lam == 'balanced'){
+    input :> CNOT(ctrl);
+  }else if(lam == 'balanced_not'){
+    input :> (CNOT(ctrl) ~> X());
+  }
+  println("----oracle 1----");
+  $(reportQureg)(input::['handle']);
+  input
+}};
+
+/*
+ * Deutsch 门 [1] -> ([1], lam) -> [1], 运行 Deutsch 算法
+ * 输入端: 1 比特量子电路
+ * 输出端: 1 比特量子电路
+ * 控制端: 1 比特量子电路, 通过 X 门; lam: oracle 函数实现，可以为常函数或平衡函数
+ *        lam 可选: const_0 const_1 balanced balanced_not
+ * */
+var deutsch = { ctrl, lam =>{
+  input =>
+    ctrl  -> `Unit<QuReg<Wire[1]>>`;
+    lam   -> `Meta`;
+    input -> `Unit<QuReg<Wire[1]>>`;
+  // 初始化状态
+  ctrl :> (X()~>H()); input :> H();
+
+  // 应用 oracle
+  ctrl :> oracle(input, lam);
+
+  // 再次干涉, 并返回结果
+  input :> H()
+}};
+
+var main = {
+  for( var lam in [ 'const_0', 'const_1', 'balanced', 'balanced_not' ]){
+    println("lam input =", lam);
+    var reg = QuReg(2);
+    var result = reg[[0]] :> deutsch(reg[[1]], lam) :> M;
+    if(result == 0){
+      println("result = const");
+    }else{
+      println("result = balanced");
+    }
+  }
+
+};
+
+return {;
+  main
+}

@@ -1,0 +1,15 @@
+<losu>
+  <info
+    name="qufu"
+    author="陈朝臣"
+    description="Qufu 夸父量子计算框架"
+    license= "AGPL-3.0;"
+  />
+  <develop>
+    <script src="./src/qufu.losu" module="./src/qufu.losu"></script>
+    <module path="./losu/modules">
+      <import name="losu" url="sdk@" />
+    </module>
+    <git path="./losu/vendors"/>
+  </develop>
+</losu>

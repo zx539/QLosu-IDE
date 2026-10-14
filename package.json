@@ -1,0 +1,53 @@
+{
+  "name": "qlosu-standalone",
+  "version": "1.0.0",
+  "description": "QLosu 量子编程平台独立本地运行版（Losu v2 + Qufu 声明式框架 + QuEST 4.2.0，WASM 编译）",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node index.js",
+    "desktop": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "monaco-editor": "0.52.2"
+  },
+  "devDependencies": {
+    "electron": "44.7.0",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "com.qlosu.ide",
+    "productName": "QLosu-IDE",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "server/**/*",
+      "www/**/*",
+      "wasm/**/*",
+      "examples/**/*",
+      "!www/vendor/drawio/LICENSE",
+      "LICENSE",
+      "开源组件声明.md",
+      "node_modules/monaco-editor/min/**/*"
+    ],
+    "extraResources": [],
+    "linux": {
+      "target": ["AppImage", "deb", "rpm"],
+      "category": "Development",
+      "icon": "www/icon.png"
+    },
+    "win": {
+      "target": ["nsis", "portable"],
+      "icon": "www/icon.ico"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.developer-tools",
+      "icon": "www/icon.icns"
+    }
+  }
+}

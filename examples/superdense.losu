@@ -1,0 +1,67 @@
+// 量子超密编码：1 个量子比特传递 2 位经典信息
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var {
+  Hadamard: H,
+  PauliX: X,
+  PauliZ: Z,
+  ControlledPauliX: CNOT
+} import qufu.Gates;
+var { Measure: M } import qufu;
+
+/*
+ * entangle 门: [2] ->() ->[1], 制备纠缠比特对
+ * 输入端: 2 比特量子线路
+ * 输出端: 1 比特量子线路, 纠缠的比特
+ * */
+var entangle = { => {
+  input => input -> `Unit<QuReg<Wire[2]>>`;
+  input[[0]] :> H();
+  input[[1]] :> CNOT(input[[0]]);
+  input
+}}
+
+/*
+ * Alice 门: [1] -> (i) -> [1], 使用 2 位经典比特编码 1 位量子比特
+ * 控制端: i->Float, 范围 [0,3]，两位经典比特的信息
+ * */
+var Alice = { ctrl =>{
+  input =>
+    ctrl  -> Float;
+    input -> `Unit<QuReg<Wire[1]>>`;
+  if(ctrl == 1){
+    input :> X();
+  }else if(ctrl == 2){
+    input :> Z();
+  }else if(ctrl == 3){
+    input :> X();
+    input :> Z();
+  }
+  input
+}};
+
+/*
+ * Bob 门: [1] -> ([1], [2]) -> [2], 解码比特并进行测量
+ * */
+var Bob = { ctrl, out =>{
+  input =>
+    ctrl -> `Unit<QuReg<Wire[1]>>`;
+    out -> `Unit<QuReg<Wire[2]>>`;
+    input -> `Unit<QuReg<Wire[1]>>`;
+  ctrl :> CNOT(input);
+  input :> H();
+  out
+}};
+
+// 主流程：对 4 种两位经典信息（00/01/10/11）逐一编码传输并解码
+for(var i = 0, 3){
+  var reg = QuReg(2);
+  // 制备纠缠比特对，并获取其中一个比特
+  var ent = (reg[[0, 1]] :> entangle())[[1]];
+  println("send info:", i);
+  // Alice 编码信息
+  var info_send = reg[[0]] :> Alice(i);
+  // Bob 解码信息
+  var info_rec = info_send :> Bob(ent, reg[[0,1]]);
+  println("recive info:", M(info_rec[[0]]), M(info_rec[[1]]));
+}

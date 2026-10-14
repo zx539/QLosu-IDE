@@ -1,0 +1,14 @@
+var { warnprintln: println } import qufu.IO;
+var teleportation import teleportation.main;
+var superdense import superdense.main;
+var grover import grover.main;
+var deutsch import deutsch.main;
+
+// println("----", "teleportation", "----");
+// teleportation();
+// println("----", "superdense", "----");
+// superdense();
+// println("----", "grover", "----");
+// grover();
+// println("----", "deutsch", "----");
+deutsch();

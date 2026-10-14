@@ -1,0 +1,64 @@
+// 量子隐形传态：借助纠缠对将量子态传递到远端比特
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var {
+  Hadamard: H,
+  PauliX: X,
+  PauliZ: Z,
+  ControlledPauliX: CNOT,
+  RotateX: Rx
+} import qufu.Gates;
+var {
+  PI,
+  Measure: M
+} import qufu;
+
+/*
+ * entangle 门: [2] ->() ->[1], 制备纠缠比特对
+ * */
+var entangle = { => {
+  input => input -> `Unit<QuReg<Wire[2]>>`;
+  input[[0]] :> H();
+  input[[1]] :> CNOT(input[[0]]);
+  input
+}}
+
+/*
+ * Alice 门: [1] ->([1]) ->[1], 执行 Alice 操作
+ * */
+var Alice = {ctrl => {
+  input => input -> `Unit<QuReg<Wire[1]>>`;
+  ctrl :> CNOT(input);
+  input :> H();
+  input
+}}
+
+/*
+ * Bob 门: [1] ->([1],[1]) ->[1], 执行 Bob 操作（根据经典测量结果修正）
+ * */
+var Bob = {ctrl, out => {
+  input =>
+    ctrl  -> `Unit<QuReg<Wire[1]>>`;
+    out   -> `Unit<QuReg<Wire[1]>>`;
+    input -> `Unit<QuReg<Wire[1]>>`;
+  if(M(input) == 1){
+    out :> Z();
+  }
+  if(M(ctrl)==1){
+    out :> X();
+  }
+  out
+}};
+
+// 主流程
+var reg = QuReg(3);
+// 初始化待传送比特为 'sqrt(0.75)|0>-sqrt(0.25)i|1>'
+var raw_info = reg[[0]] :> Rx(PI / 3);
+// 制备纠缠比特对，并获取其中一个比特
+var qe = (reg[[1, 2]] :> entangle())[[0]];
+// Alice 操作
+var trans_info = raw_info :> Alice(qe);
+// Bob 操作
+var bob_info = trans_info :> Bob(qe, reg[[2]]);
+// 计算期望结果, 应为 0.75, 0.25
+println("传送后 P(0) =", bob_info(0), " P(1) =", bob_info(1));

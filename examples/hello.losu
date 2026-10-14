@@ -1,0 +1,9 @@
+// QLosu 入门示例：语法与输出
+var { println } import qufu.IO;
+
+println("Hello, Quantum World!");
+println("Losu v2 表达式：", 1 + 2 * 3, "→", (1 + 2) * 3);
+println("字符串拼接：", "QLosu" .. " 量子编程");
+
+var pi = 3.14159;
+println("圆周率 π =", pi);

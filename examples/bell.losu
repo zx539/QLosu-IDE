@@ -1,0 +1,20 @@
+// Bell 纠缠态：H 门 + CNOT 门制备 |Φ+⟩ = (|00⟩ + |11⟩) / √2
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var { Hadamard: H, ControlledPauliX: CNOT } import qufu.Gates;
+var { Measure: M } import qufu;
+
+var reg = QuReg(2);
+var w0 = reg[[0]];
+var w1 = reg[[1]];
+
+// w0 施加 Hadamard 门进入叠加态
+w0 :> H();
+// `目标 :> CNOT(控制)`：以 w0 为控制比特、w1 为目标比特
+w1 :> CNOT(w0);
+
+// 每个比特单独测得 1 的概率均为 0.5
+println("P(w0=1) =", w0(1), " P(w1=1) =", w1(1));
+
+// 测量：纠缠对坍缩后两比特必然相同（00 或 11）
+println("Bell 态测量: ", M(w0), " ", M(w1));

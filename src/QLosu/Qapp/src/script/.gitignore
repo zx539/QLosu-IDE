@@ -1,0 +1,6 @@
+losu/
+src/*.ffi.h
+*.o
+QLosu
+qureg.log
+log

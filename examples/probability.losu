@@ -1,0 +1,17 @@
+// 量子概率测量：叠加态下各基态的坍缩概率
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var { Hadamard: H, PauliX: X, RotateX: Rx } import qufu.Gates;
+var { PI } import qufu;
+
+// 单个比特经过 H 门：P(0)=P(1)=0.5
+var reg = QuReg(1);
+var w = reg[[0]];
+w :> H();
+println("H 门后: P(0) =", w(0), " P(1) =", w(1));
+
+// 旋转门 Rx(π/3)：|0⟩ → cos(π/6)|0⟩ - i·sin(π/6)|1⟩，P(1) = sin²(π/6) = 0.25
+var reg2 = QuReg(1);
+var w2 = reg2[[0]];
+w2 :> Rx(PI / 3);
+println("Rx(π/3) 后: P(0) =", w2(0), " P(1) =", w2(1));

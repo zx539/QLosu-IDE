@@ -1,0 +1,502 @@
+{
+  "output": "/mnt/d/软件杯-基于大模型的个性化资源生成与学习多智能体系统/QLosu-standalone/洛书量子编程语言运行平台-源代码节选-60页.docx",
+  "page_count": 60,
+  "lines_per_page": 50,
+  "pages": [
+    {
+      "page": 1,
+      "type": "JavaScript",
+      "sources": [
+        "index.js"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 2,
+      "type": "JavaScript",
+      "sources": [
+        "index.js",
+        "test.js"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 3,
+      "type": "JavaScript",
+      "sources": [
+        "test.js"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 4,
+      "type": "JavaScript",
+      "sources": [
+        "test.js",
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome-darkmode-toggle.js"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 5,
+      "type": "JavaScript",
+      "sources": [
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome-darkmode-toggle.js",
+        "www/index.html::script"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 6,
+      "type": "JavaScript",
+      "sources": [
+        "www/index.html::script"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 7,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 8,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 9,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 10,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 11,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 12,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 13,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 14,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 15,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 16,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 17,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 18,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 19,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 20,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 21,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 22,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 23,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 24,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 25,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 26,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 27,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 28,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 29,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 30,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 31,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 32,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 33,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 34,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 35,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 36,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 37,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 38,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 39,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 40,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 41,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 42,
+      "type": "WASM/Losu",
+      "sources": [
+        "wasm/qlosu.m.wasm::hex"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 43,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/automated/apply_no_unitary_pauli_gadget.c",
+        "src/QLosu/Qapp/examples/extended/dynamics.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 44,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/extended/dynamics.c",
+        "src/QLosu/Qapp/examples/isolated/complex_arithmetic.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 45,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/isolated/complex_arithmetic.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 46,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/isolated/complex_arithmetic.c",
+        "src/QLosu/Qapp/examples/isolated/initialising_krausmaps.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 47,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/isolated/initialising_krausmaps.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 48,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/isolated/initialising_krausmaps.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 49,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/isolated/initialising_matrices.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 50,
+      "type": "C",
+      "sources": [
+        "src/QLosu/Qapp/examples/isolated/initialising_matrices.c"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 51,
+      "type": "HTML",
+      "sources": [
+        "www/index.html"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 52,
+      "type": "HTML",
+      "sources": [
+        "www/index.html"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 53,
+      "type": "HTML",
+      "sources": [
+        "www/index.html"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 54,
+      "type": "HTML",
+      "sources": [
+        "www/index.html"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 55,
+      "type": "HTML",
+      "sources": [
+        "www/index.html",
+        "src/QLosu/Qapp/utils/docs/layout/header.html"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 56,
+      "type": "CSS",
+      "sources": [
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome-sidebar-only-darkmode-toggle.css",
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome-sidebar-only.css"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 57,
+      "type": "CSS",
+      "sources": [
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome-sidebar-only.css",
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome.css"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 58,
+      "type": "CSS",
+      "sources": [
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome.css"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 59,
+      "type": "CSS",
+      "sources": [
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome.css"
+      ],
+      "lines": 50
+    },
+    {
+      "page": 60,
+      "type": "CSS",
+      "sources": [
+        "src/QLosu/Qapp/utils/docs/layout/doxygen-awesome.css"
+      ],
+      "lines": 50
+    }
+  ],
+  "excluded_globs": [
+    "src/**/QuEST/**",
+    "src/**/quest/**",
+    "node_modules/**"
+  ],
+  "binary_encoding": "wasm/qlosu.m.wasm represented as 16-byte hexadecimal rows"
+}

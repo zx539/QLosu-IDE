@@ -1,0 +1,139 @@
+// init QuEST Environment
+var QuEnv =  $(initQuESTEnv)() -> `Resource<C::QuEST::QuESTEnv>`;
+
+
+var __get_length = {
+  unit => unit -> Unit;
+  var width = 0;
+  while(unit::[width]->?Float){
+    width = width + 1;
+  };
+  width
+};
+
+// QuReg Constructor
+var QuReg = {
+  bits => bits -> Float;
+
+  var QuWire = {
+    handle, io
+      =>  handle -> `Resource<C::QuEST::Qureg>`;
+          io -> Unit;
+
+    var __init__ = _;
+    var wirebits = __get_length(io);
+    {
+      '->': "QuReg<Wire[".. wirebits->&String.."]>",
+      'handle': handle,
+      'io': io,
+      'bits': wirebits,
+      '[]': {
+        self, index => index -> Unit;
+        var newidx = [];
+        for(var i = 0, __get_length(index)-1, 1){
+          newidx::[i] = io::[index::[i]]
+        };
+        __init__(self::['handle'], newidx)
+      },
+      '()': {
+        self, num => num -> Float;
+        var per = 1;
+        for(var i = 0, wirebits-1, 1){
+          per = per * $(calcProbOfQubitOutcome)(self::['handle'], io::[i], num);
+        }
+        per
+      }
+    }
+  };
+
+  {
+    '->': "QuReg["..bits->&String.."]",
+    'bits': bits,
+    'handle': $(createQureg)(bits)-> `Resource<C::QuEST::Qureg>`,
+    '()': {
+      self =>
+      $(reportQureg)(self::['handle']);
+    },
+    '[]': {
+      self, index => index-> `Unit`;
+      QuWire(self::['handle'], index)
+    }
+  }
+}
+
+// Gates
+var Gates = {
+  // Unit<QuReg<Wire[1]>> :> () => Unit<QuReg<Wire[1]>>
+  Hadamard: { => {
+    input => input -> `Unit<QuReg<Wire[1]>>`;
+    $(applyHadamard)(input::['handle'], input::['io']::[0]);
+    input
+  }},
+  // Unit<QuReg<Wire[1]>> :> () => Unit<QuReg<Wire[1]>>
+  PauliX: { => {
+    input => input -> `Unit<QuReg<Wire[1]>>`;
+    $(applyPauliX)(input::['handle'], input::['io']::[0]);
+    input
+  }},
+  // Unit<QuReg<Wire[1]>> :> () => Unit<QuReg<Wire[1]>>
+  PauliZ: { => {
+    input => input -> `Unit<QuReg<Wire[1]>>`;
+    $(applyPauliZ)(input::['handle'], input::['io']::[0]);
+    input
+  }},
+  // Unit<QuReg<Wire[1]>> :> (Unit<QuReg<Wire[1]>>) => Unit<QuReg<Wire[1]>>
+  ControlledPauliX: {
+    ctrl => ctrl -> `Unit<QuReg<Wire[1]>>`;
+    {
+      input => input -> `Unit<QuReg<Wire[1]>>`;
+      $(applyControlledPauliX)(ctrl::['handle'], ctrl::['io']::[0], input::['io']::[0]);
+      input
+    }
+  },
+  // Unit<QuReg<Wire[1]>> :> (Float) => Unit<QuReg<Wire[1]>>
+  RotateX: {
+    theta => theta -> Float;
+    {
+      input => input -> `Unit<QuReg<Wire[1]>>`;
+      $(applyRotateX)(input::['handle'], input::['io']::[0], theta);
+      input
+    }
+  },
+  // Unit<QuReg<Wire[1]>> :> (Unit<QuReg<Wire[2]>>) => Unit<QuReg<Wire[1]>>
+  Toffoli: {
+    ctrl => ctrl -> `Unit<QuReg<Wire[2]>>`;
+    {
+      input => input -> `Unit<QuReg<Wire[1]>>`;
+      $(applyToffoli)(
+        ctrl::['handle'],
+        ctrl::['io']::[0],
+        ctrl::['io']::[1],
+        input::['io']::[0]
+      );
+      input
+    }
+  }
+}
+
+// Measure
+var Measure = {
+  wire => wire -> `Unit<QuReg<Wire[1]>>`;
+  $(applyQubitMeasurement)(wire::['handle'], wire::['io']::[0])
+}
+
+// io
+var IO = {
+  println: $(println),
+  errprintln: $(eprintln),
+  warnprintln: $(warnprintln),
+}
+
+return {
+  PI: $(PI)() ;
+  QuEnv,
+  QuReg,
+  Gates,
+  Measure,
+  IO,
+
+}

@@ -1,0 +1,80 @@
+var { println } import qufu.IO;
+var QuReg import qufu.QuReg;
+var {
+  Hadamard: H,
+  PauliX: X,
+  PauliZ: Z,
+  RotateX: Rx,
+  ControlledPauliX: CNOT
+} import qufu.Gates;
+var {
+  PI,
+  Measure: M
+} import qufu;
+
+/*
+ * entangle 门: [2] -> () ->[2], 制备纠缠比特对
+ * 输入端: 2 比特量子线路
+ * 输出端: 2 比特量子线路, 纠缠的比特
+ * 控制端: 无
+ * */
+var entangle = { => {
+  input => input -> `Unit<QuReg<Wire[2]>>`;
+  input[[0]] :> H();
+  input[[1]] :> CNOT(input[[0]]);
+  input
+}}
+
+/*
+ * Alice 门: [1] ->([1]) ->[1], 执行 Alice 操作
+ * 输入端: 1 比特量子线路, 信息比特
+ * 输出端: 1 比特量子线路, 处理后信息比特
+ * 控制端: 1 比特量子线路, 纠缠比特
+ * */
+var Alice = {ctrl => {
+  input => input -> `Unit<QuReg<Wire[1]>>`;
+  ctrl :> CNOT(input);
+  input :> H();
+  input
+}}
+
+/*
+ * Bob 门: [1] ->([1],[1]) ->[1], 执行 Bob 操作
+ * 输入端: 1 比特量子线路
+ * 输出端: 1 比特量子线路
+ * 控制端: 1 比特量子线路x2, 纠缠比特、输出线路
+ * */
+var Bob = {ctrl, out => {
+  input =>
+    ctrl  -> `Unit<QuReg<Wire[1]>>`;
+    out   -> `Unit<QuReg<Wire[1]>>`;
+    input -> `Unit<QuReg<Wire[1]>>`;
+  if(M(input) == 1){
+    out :> Z();
+  }
+  if(M(ctrl)==1){
+    out :> X();
+  }
+  out
+}};
+
+var main = {
+  var reg = QuReg(3);
+  // 初始化待传送比特为 'sqrt(0.75)|0>-sqrt(0.25)i|1>'
+  var raw_info = reg[[0]] :> Rx(PI / 3);
+  // 制备纠缠比特对，并获取其中一个比特
+  var qe = (reg[[1, 2]] :> entangle())[[0]];
+  // Alice 操作
+  var trans_info = raw_info :> Alice(qe);
+  // Bob 操作
+  var bob_info = trans_info :> Bob(qe, reg[[2]]);
+  // 计算期望结果, 应为 0.75, 0.25
+  println(bob_info(0), bob_info(1));
+};
+
+return { ;
+  entangle,
+  Alice,
+  Bob,
+  main,
+}
