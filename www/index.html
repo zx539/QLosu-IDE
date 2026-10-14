@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QLosu 量子编程 IDE</title>
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="/node_modules/xterm/css/xterm.css">
+  <link rel="stylesheet" href="/node_modules/katex/dist/katex.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
@@ -28,6 +30,10 @@
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
       保存 <span class="kbd">Ctrl+S</span>
     </button>
+    <button class="btn" onclick="app.openSyntaxModal()" title="语法手册">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      语法
+    </button>
     <div class="spacer"></div>
     <select class="input" onchange="app.applyTheme(this.value)" id="theme-select">
       <option value="dark">深色主题</option>
@@ -50,6 +56,7 @@
 
     <!-- 侧边栏 -->
     <div id="sidebar">
+      <div class="resize-handle"></div>
       <div class="side-view active" data-view="workspace">
         <div class="side-head">
           工作区
@@ -92,11 +99,14 @@
 
       <!-- 面板 -->
       <div id="panel">
+        <div class="resize-handle-top"></div>
         <div class="panel-tabs">
           <button class="ptab active" data-tab="output" onclick="app.switchPanelTab('output')">输出</button>
+          <button class="ptab" data-tab="terminal" onclick="app.switchPanelTab('terminal')">终端</button>
           <button class="ptab" data-tab="problems" onclick="app.switchPanelTab('problems')">问题<span class="badge" style="display:none">0</span></button>
         </div>
         <div class="pview active" id="output"></div>
+        <div class="pview" id="terminal-container"></div>
         <div class="pview" id="problems"></div>
       </div>
     </div>
@@ -105,6 +115,7 @@
 
     <!-- 右侧栏 -->
     <div id="rightbar">
+      <div class="resize-handle"></div>
       <div class="right-tabs">
         <button class="rtab active" data-tab="circuit" onclick="app.switchRightTab('circuit')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
@@ -113,6 +124,10 @@
         <button class="rtab" data-tab="flowchart" onclick="app.switchRightTab('flowchart')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           程序流程
+        </button>
+        <button class="rtab" data-tab="syntax" onclick="app.switchRightTab('syntax')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          洛书语法
         </button>
         <button class="rtab" data-tab="agent" onclick="app.switchRightTab('agent')">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
@@ -128,9 +143,10 @@
         <div class="diagram-host"></div>
         <div class="diagram-empty">请先运行代码</div>
         <div class="stepper" id="stepper" style="display:none">
-          <button class="btn icon sm">◀</button>
-          <input type="range" id="step-range" min="0" max="0" value="0">
-          <button class="btn icon sm">▶</button>
+          <button class="btn icon sm" id="step-prev" onclick="app.stepPrev()">◀</button>
+          <button class="btn icon sm" id="step-play" onclick="app.stepPlay()">▶ 播放</button>
+          <button class="btn icon sm" id="step-next" onclick="app.stepNext()">▶</button>
+          <input type="range" id="step-range" min="0" max="0" value="0" oninput="app.stepTo(this.value)">
           <span id="step-label" style="font-size:12px;white-space:nowrap">步骤 1 / 1</span>
         </div>
         <div class="state-view" id="state-view" style="display:none">
@@ -142,6 +158,13 @@
       <div class="rview" data-tab="flowchart">
         <div class="diagram-host"></div>
         <div class="diagram-empty">流程图将在运行后显示</div>
+      </div>
+
+      <div class="rview" data-tab="syntax">
+        <div class="rtoolbar">
+          <span class="label">洛书语法手册</span>
+        </div>
+        <div id="syntax-content" style="padding:16px;overflow-y:auto;height:calc(100% - 40px)"></div>
       </div>
 
       <div class="rview" data-tab="agent">
@@ -185,6 +208,19 @@
     </div>
   </div>
 
+  <!-- 语法手册模态框 -->
+  <div id="syntax-modal" class="modal" style="display:none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>洛书语法手册</h2>
+        <button class="btn icon" onclick="app.closeSyntaxModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="syntax-content">
+        加载中...
+      </div>
+    </div>
+  </div>
+
   <!-- 状态栏 -->
   <div id="statusbar">
     <div class="sb-item" id="sb-version"></div>
@@ -220,10 +256,16 @@
   </script>
   <script src="vendor/monaco/vs/loader.js"></script>
   <script src="vendor/drawio/viewer-static.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.css">
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.8.0/lib/xterm-addon-fit.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.19.0/dist/katex.min.js"></script>
   <script src="js/core/trace.js"></script>
   <script src="js/core/losu-parse.js"></script>
   <script src="js/core/drawio.js"></script>
+  <script src="js/terminal.js"></script>
   <script src="js/ai-assistant.js"></script>
   <script src="js/app.js"></script>
 </body>

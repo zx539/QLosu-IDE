@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>QLosu IDE - 功能测试</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #0d1117;
+      color: #c9d1d9;
+    }
+    h1 { color: #58a6ff; }
+    h2 { color: #79c0ff; margin-top: 2rem; }
+    .test-section {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    .status.ok { background: #238636; color: #fff; }
+    .status.fail { background: #da3633; color: #fff; }
+    .status.pending { background: #6e7681; color: #fff; }
+    button {
+      background: #238636;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 0.5rem 0.5rem 0.5rem 0;
+    }
+    button:hover { background: #2ea043; }
+    pre {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 1rem;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+    code { color: #79c0ff; }
+    .result {
+      margin-top: 0.5rem;
+      padding: 0.75rem;
+      background: #0d1117;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧪 QLosu IDE 功能测试</h1>
+
+  <div class="test-section">
+    <h2>1. 模块加载测试</h2>
+    <button onclick="testModules()">运行测试</button>
+    <div id="module-result" class="result"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>2. 流程图生成测试</h2>
+    <button onclick="testFlowchart()">测试流程图</button>
+    <div id="flowchart-result" class="result"></div>
+    <div id="flowchart-preview" style="margin-top:1rem;"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>3. 量子线路图测试</h2>
+    <button onclick="testCircuit()">测试线路图</button>
+    <div id="circuit-result" class="result"></div>
+    <div id="circuit-preview" style="margin-top:1rem;"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>4. 终端测试</h2>
+    <button onclick="testTerminal()">测试终端</button>
+    <div id="terminal-result" class="result"></div>
+    <div id="terminal-preview" style="height:300px;margin-top:1rem;background:#000;border-radius:6px;"></div>
+  </div>
+
+  <div class="test-section">
+    <h2>5. Markdown + LaTeX 渲染测试</h2>
+    <button onclick="testMarkdown()">测试渲染</button>
+    <div id="markdown-result" class="result"></div>
+    <div id="markdown-preview" style="margin-top:1rem;padding:1rem;background:#0d1117;border:1px solid #30363d;border-radius:6px;"></div>
+  </div>
+
+  <!-- 加载依赖 -->
+  <script src="/vendor/monaco/loader.js"></script>
+  <script src="/vendor/drawio/viewer-static.min.js"></script>
+  <script src="/node_modules/xterm/lib/xterm.js"></script>
+  <script src="/node_modules/xterm-addon-fit/lib/xterm-addon-fit.js"></script>
+  <script src="/node_modules/marked/marked.min.js"></script>
+  <script src="/node_modules/katex/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="/node_modules/xterm/css/xterm.css">
+  <link rel="stylesheet" href="/node_modules/katex/dist/katex.min.css">
+
+  <script src="js/core/trace.js"></script>
+  <script src="js/core/losu-parse.js"></script>
+  <script src="js/core/drawio.js"></script>
+  <script src="js/terminal.js"></script>
+
+  <script>
+    function log(elementId, message, type = 'info') {
+      const el = document.getElementById(elementId);
+      const color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#79c0ff';
+      el.innerHTML += `<div style="color:${color}">${message}</div>`;
+    }
+
+    function testModules() {
+      const result = document.getElementById('module-result');
+      result.innerHTML = '<div style="color:#79c0ff">正在检测模块...</div>';
+
+      const tests = [
+        { name: 'LosuParse', obj: window.LosuParse },
+        { name: 'QDrawio', obj: window.QDrawio },
+        { name: 'QTrace', obj: window.QTrace },
+        { name: 'GraphViewer', obj: window.GraphViewer },
+        { name: 'Terminal (xterm)', obj: window.Terminal },
+        { name: 'FitAddon', obj: window.FitAddon?.FitAddon },
+        { name: 'marked', obj: window.marked },
+        { name: 'katex', obj: window.katex },
+      ];
+
+      let html = '';
+      tests.forEach(t => {
+        const status = t.obj ? '✅' : '❌';
+        const color = t.obj ? '#51cf66' : '#ff6b6b';
+        html += `<div style="color:${color}">${status} ${t.name}: ${t.obj ? 'OK' : 'NOT FOUND'}</div>`;
+      });
+      result.innerHTML = html;
+    }
+
+    function testFlowchart() {
+      const result = document.getElementById('flowchart-result');
+      const preview = document.getElementById('flowchart-preview');
+      result.innerHTML = '';
+      preview.innerHTML = '';
+
+      try {
+        log('flowchart-result', '✓ 开始测试流程图生成...', 'info');
+
+        const testCode = `函数 测试函数(x)
+  如果 x > 0
+    返回 x * 2
+  否则
+    返回 0
+  结束
+结束
+
+var a = 10
+测试函数(a)
+输出 a`;
+
+        log('flowchart-result', '✓ 解析代码...', 'info');
+        const prog = LosuParse.parseProgram(testCode);
+        log('flowchart-result', `✓ 解析成功: ${prog.functions.length} 个函数, ${prog.main.length} 条主语句`, 'success');
+
+        log('flowchart-result', '✓ 生成流程图 XML...', 'info');
+        const xml = QDrawio.flowchartXml(prog, { theme: 'dark', title: '测试流程图' });
+        log('flowchart-result', `✓ XML 生成成功 (${xml.length} 字符)`, 'success');
+
+        log('flowchart-result', '✓ 渲染流程图...', 'info');
+        preview.innerHTML = '<div class="mxgraph" style="max-width:100%;border:1px solid #30363d;"></div>';
+        const cfg = { xml, highlight: '#6aa7ff', nav: true, resize: true };
+        preview.querySelector('.mxgraph').setAttribute('data-mxgraph', JSON.stringify(cfg));
+
+        if (typeof GraphViewer !== 'undefined') {
+          GraphViewer.processElements();
+          log('flowchart-result', '✅ 流程图渲染完成!', 'success');
+        } else {
+          log('flowchart-result', '❌ GraphViewer 未加载', 'error');
+        }
+      } catch (e) {
+        log('flowchart-result', `❌ 错误: ${e.message}`, 'error');
+        console.error('流程图测试失败:', e);
+      }
+    }
+
+    function testCircuit() {
+      const result = document.getElementById('circuit-result');
+      const preview = document.getElementById('circuit-preview');
+      result.innerHTML = '';
+      preview.innerHTML = '';
+
+      try {
+        log('circuit-result', '✓ 开始测试量子线路图...', 'info');
+
+        const testTrace = {
+          registers: [{ id: 0, qubits: 2 }],
+          ops: [
+            { reg: 0, op: 'H', qubits: [0], state: [0.707, 0, 0.707, 0, 0, 0, 0, 0] },
+            { reg: 0, op: 'CNOT', qubits: [0, 1], state: [0.707, 0, 0, 0, 0, 0, 0.707, 0] },
+            { reg: 0, op: 'M', qubits: [0, 1], state: [0.707, 0, 0, 0, 0, 0, 0.707, 0] },
+          ]
+        };
+
+        log('circuit-result', `✓ 模拟轨迹: ${testTrace.ops.length} 个操作`, 'info');
+
+        const xml = QDrawio.circuitXml(testTrace, 0, { theme: 'dark' });
+        log('circuit-result', `✓ XML 生成成功 (${xml.length} 字符)`, 'success');
+
+        preview.innerHTML = '<div class="mxgraph" style="max-width:100%;border:1px solid #30363d;"></div>';
+        const cfg = { xml, highlight: '#6aa7ff', nav: true, resize: true };
+        preview.querySelector('.mxgraph').setAttribute('data-mxgraph', JSON.stringify(cfg));
+
+        if (typeof GraphViewer !== 'undefined') {
+          GraphViewer.processElements();
+          log('circuit-result', '✅ 量子线路图渲染完成!', 'success');
+        } else {
+          log('circuit-result', '❌ GraphViewer 未加载', 'error');
+        }
+      } catch (e) {
+        log('circuit-result', `❌ 错误: ${e.message}`, 'error');
+        console.error('线路图测试失败:', e);
+      }
+    }
+
+    function testTerminal() {
+      const result = document.getElementById('terminal-result');
+      const preview = document.getElementById('terminal-preview');
+      result.innerHTML = '';
+      preview.innerHTML = '';
+
+      try {
+        log('terminal-result', '✓ 开始测试终端...', 'info');
+
+        if (typeof Terminal === 'undefined') {
+          log('terminal-result', '❌ xterm.js 未加载', 'error');
+          return;
+        }
+
+        const term = new Terminal({
+          cursorBlink: true,
+          fontSize: 14,
+          theme: {
+            background: '#0d1117',
+            foreground: '#c9d1d9',
+            cursor: '#58a6ff',
+          }
+        });
+
+        term.open(preview);
+        log('terminal-result', '✓ 终端创建成功', 'success');
+
+        if (typeof FitAddon !== 'undefined') {
+          const fitAddon = new FitAddon.FitAddon();
+          term.loadAddon(fitAddon);
+          fitAddon.fit();
+          log('terminal-result', '✓ FitAddon 加载成功', 'success');
+        }
+
+        term.writeln('\x1b[1;36m欢迎使用 QLosu IDE 终端!\x1b[0m');
+        term.writeln('');
+        term.writeln('\x1b[32m✓\x1b[0m 终端功能正常');
+        term.writeln('\x1b[32m✓\x1b[0m 支持 ANSI 颜色');
+        term.writeln('\x1b[32m✓\x1b[0m 支持中文显示');
+        term.write('\n$ ');
+
+        log('terminal-result', '✅ 终端测试完成!', 'success');
+      } catch (e) {
+        log('terminal-result', `❌ 错误: ${e.message}`, 'error');
+        console.error('终端测试失败:', e);
+      }
+    }
+
+    function testMarkdown() {
+      const result = document.getElementById('markdown-result');
+      const preview = document.getElementById('markdown-preview');
+      result.innerHTML = '';
+      preview.innerHTML = '';
+
+      try {
+        log('markdown-result', '✓ 开始测试 Markdown 渲染...', 'info');
+
+        const testMarkdown = `# 洛书量子编程语言
+
+## 量子门操作
+
+### Hadamard 门
+创建叠加态：$|\\psi\\rangle = \\frac{1}{\\sqrt{2}}(|0\\rangle + |1\\rangle)$
+
+### CNOT 门
+纠缠操作的矩阵形式：
+
+$$
+CNOT = \\begin{pmatrix}
+1 & 0 & 0 & 0 \\\\
+0 & 1 & 0 & 0 \\\\
+0 & 0 & 0 & 1 \\\\
+0 & 0 & 1 & 0
+\\end{pmatrix}
+$$
+
+## 代码示例
+
+\`\`\`losu
+// 创建 Bell 态
+H(q0)
+CNOT(q0, q1)
+M(q0, q1)
+\`\`\`
+
+**测试完成!**
+`;
+
+        if (typeof marked === 'undefined') {
+          log('markdown-result', '❌ marked.js 未加载', 'error');
+          return;
+        }
+
+        log('markdown-result', '✓ 解析 Markdown...', 'info');
+        let html = marked.parse(testMarkdown);
+        log('markdown-result', '✓ Markdown 解析成功', 'success');
+
+        if (typeof katex !== 'undefined') {
+          log('markdown-result', '✓ 渲染 LaTeX 公式...', 'info');
+
+          // 块级公式
+          html = html.replace(/\$\$([^\$]+)\$\$/g, (match, tex) => {
+            try {
+              return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false });
+            } catch (e) {
+              return match;
+            }
+          });
+
+          // 行内公式
+          html = html.replace(/\$([^\$\n]+)\$/g, (match, tex) => {
+            try {
+              return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false });
+            } catch (e) {
+              return match;
+            }
+          });
+
+          log('markdown-result', '✓ LaTeX 渲染成功', 'success');
+        } else {
+          log('markdown-result', '⚠ katex.js 未加载，跳过公式渲染', 'info');
+        }
+
+        preview.innerHTML = html;
+        log('markdown-result', '✅ Markdown + LaTeX 测试完成!', 'success');
+      } catch (e) {
+        log('markdown-result', `❌ 错误: ${e.message}`, 'error');
+        console.error('Markdown 测试失败:', e);
+      }
+    }
+
+    // 页面加载时自动测试模块
+    window.addEventListener('load', () => {
+      setTimeout(testModules, 500);
+    });
+  </script>
+</body>
+</html>

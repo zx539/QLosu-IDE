@@ -10,8 +10,14 @@
     "dist": "electron-builder"
   },
   "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
     "express": "^4.21.2",
-    "monaco-editor": "0.52.2"
+    "katex": "^0.19.0",
+    "marked": "^11.2.0",
+    "monaco-editor": "0.52.2",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
   },
   "devDependencies": {
     "electron": "44.7.0",
@@ -36,16 +42,26 @@
     ],
     "extraResources": [],
     "linux": {
-      "target": ["AppImage", "deb", "rpm"],
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
       "category": "Development",
       "icon": "www/icon.png"
     },
     "win": {
-      "target": ["nsis", "portable"],
+      "target": [
+        "nsis",
+        "portable"
+      ],
       "icon": "www/icon.ico"
     },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "category": "public.app-category.developer-tools",
       "icon": "www/icon.icns"
     }

@@ -197,7 +197,27 @@ select.input:focus, input.input:focus, textarea.input:focus { border-color: var(
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  position: relative;
+  resize: horizontal;
+  overflow: hidden;
   min-width: 160px;
+  max-width: 600px;
+}
+
+#sidebar .resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 10;
+}
+
+#sidebar .resize-handle:hover,
+#sidebar .resize-handle:active {
+  background: var(--accent);
 }
 .side-view { display: none; flex-direction: column; min-height: 0; flex: 1; }
 .side-view.active { display: flex; }
@@ -293,7 +313,35 @@ select.input:focus, input.input:focus, textarea.input:focus { border-color: var(
   text-align: center;
 }
 
-#panel { height: 32%; min-height: 60px; flex: none; display: flex; flex-direction: column; background: var(--panel); border-top: 1px solid var(--border); }
+#panel {
+  height: 32%;
+  min-height: 60px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-top: 1px solid var(--border);
+  position: relative;
+  resize: vertical;
+  overflow: hidden;
+  max-height: 80%;
+}
+
+#panel .resize-handle-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  cursor: ns-resize;
+  background: transparent;
+  z-index: 10;
+}
+
+#panel .resize-handle-top:hover,
+#panel .resize-handle-top:active {
+  background: var(--accent);
+}
 .panel-tabs { display: flex; align-items: center; gap: 4px; height: 32px; padding: 0 8px; flex: none; }
 .ptab {
   border: none;
@@ -325,13 +373,49 @@ select.input:focus, input.input:focus, textarea.input:focus { border-color: var(
 #output .o-ok { color: var(--ok); }
 #output .o-state { color: var(--accent-2); }
 #output .o-tag { color: var(--text-3); font-style: italic; }
+
+#terminal-container {
+  width: 100%;
+  height: 100%;
+  background: var(--code-bg);
+  padding: 8px;
+}
+
 .problem { display: flex; gap: 8px; padding: 6px 14px; cursor: pointer; }
 .problem:hover { background: var(--hover); }
 .problem .loc { color: var(--text-3); }
 .problem .msg { color: var(--err); }
 
 /* ---------- 右侧面板 ---------- */
-#rightbar { width: 440px; min-width: 280px; flex: none; display: flex; flex-direction: column; background: var(--panel); border-left: 1px solid var(--border); }
+#rightbar {
+  width: 440px;
+  min-width: 280px;
+  max-width: 800px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  position: relative;
+  resize: horizontal;
+  overflow: hidden;
+}
+
+#rightbar .resize-handle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 10;
+}
+
+#rightbar .resize-handle:hover,
+#rightbar .resize-handle:active {
+  background: var(--accent);
+}
 .right-tabs { display: flex; height: 36px; flex: none; border-bottom: 1px solid var(--border); padding: 0 4px; gap: 2px; }
 .rtab {
   border: none;
@@ -441,11 +525,22 @@ select.input:focus, input.input:focus, textarea.input:focus { border-color: var(
 
 /* ---------- 弹窗 ---------- */
 .modal-mask { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.45); display: grid; place-items: center; z-index: 100; }
-.modal { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); width: min(560px, 92vw); max-height: 90vh; display: flex; flex-direction: column; }
+.modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 1000; }
+.modal-content { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); width: min(800px, 92vw); max-height: 90vh; display: flex; flex-direction: column; }
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+.modal-header h2 { margin: 0; font-size: 18px; font-weight: 600; }
 .modal.wide { width: 94vw; height: 90vh; }
 .modal-head { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 600; }
-.modal-body { padding: 14px 16px; overflow: auto; flex: 1; }
+.modal-body { padding: 20px; overflow: auto; flex: 1; line-height: 1.6; }
 .modal-body.flush { padding: 0; }
+.modal-body h1 { font-size: 24px; margin-top: 24px; margin-bottom: 12px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+.modal-body h2 { font-size: 20px; margin-top: 20px; margin-bottom: 10px; color: var(--accent); }
+.modal-body h3 { font-size: 16px; margin-top: 16px; margin-bottom: 8px; }
+.modal-body pre { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow-x: auto; }
+.modal-body code { background: var(--bg); padding: 2px 6px; border-radius: 3px; font-family: 'Monaco', 'Courier New', monospace; font-size: 13px; }
+.modal-body pre code { background: none; padding: 0; }
+.modal-body ul, .modal-body ol { margin-left: 24px; }
+.modal-body li { margin: 6px 0; }
 .modal-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--border); }
 .form-row { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: 10px; margin-bottom: 10px; }
 .form-row label { color: var(--text-2); }
@@ -463,4 +558,74 @@ select.input:focus, input.input:focus, textarea.input:focus { border-color: var(
 
 /* Monaco 中运行错误行装饰 */
 .err-line { background: rgba(248, 81, 73, 0.12); }
+
+/* ---------- 语法手册内容样式 ---------- */
+#syntax-content {
+  line-height: 1.7;
+}
+#syntax-content h1 {
+  font-size: 24px;
+  margin: 0 0 16px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+  color: var(--text);
+}
+#syntax-content h2 {
+  font-size: 20px;
+  margin: 24px 0 12px 0;
+  color: var(--text);
+}
+#syntax-content h3 {
+  font-size: 16px;
+  margin: 16px 0 8px 0;
+  color: var(--text-2);
+}
+#syntax-content p {
+  margin: 8px 0;
+  color: var(--text-2);
+}
+#syntax-content code {
+  background: var(--code-bg);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: Menlo, Monaco, 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--accent);
+}
+#syntax-content pre {
+  background: var(--code-bg);
+  padding: 12px 14px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 10px 0;
+  border: 1px solid var(--border);
+}
+#syntax-content pre code {
+  background: none;
+  padding: 0;
+  color: var(--text);
+}
+#syntax-content ul, #syntax-content ol {
+  margin: 8px 0;
+  padding-left: 24px;
+  color: var(--text-2);
+}
+#syntax-content li {
+  margin: 4px 0;
+}
+#syntax-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 20px 0;
+}
+#syntax-content strong {
+  color: var(--text);
+}
+
+/* ---------- 拖拽状态 ---------- */
+.sash.dragging,
+.resize-handle.dragging {
+  background: var(--accent) !important;
+}
+
 .err-glyph { background: var(--err); border-radius: 50%; margin-left: 5px; width: 8px !important; height: 8px !important; margin-top: 6px; }

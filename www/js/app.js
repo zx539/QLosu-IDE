@@ -23,6 +23,7 @@
     lastTrace: null,
     chatHistory: [],
     aiAssistant: null,
+    autoPlayInterval: null,
   };
 
   let editor;
@@ -68,6 +69,9 @@
     document.documentElement.setAttribute('data-theme', t);
     localStorage.setItem('qlosu_theme', t);
     if (editor) monaco.editor.setTheme(t === 'light' ? 'vs' : 'vs-dark');
+    if (window.terminalInitialized && typeof QTerminal !== 'undefined') {
+      QTerminal.updateTheme(t);
+    }
   }
 
   // ---------- 视图切换 ----------
@@ -82,7 +86,10 @@
   function switchPanelTab(name) {
     state.panelTab = name;
     $$('.ptab').forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
-    $$('.pview').forEach((v) => v.classList.toggle('active', v.id === name));
+    $$('.pview').forEach((v) => v.classList.toggle('active', v.id === name || v.id === name + '-container'));
+    if (name === 'terminal' && !window.terminalInitialized) {
+      initTerminal();
+    }
   }
 
   function switchRightTab(name) {
@@ -90,6 +97,7 @@
     els.rightTabs.forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
     els.rviews.forEach((v) => v.classList.toggle('active', v.dataset.tab === name));
     if (name === 'circuit' || name === 'flowchart') refreshDiagram();
+    if (name === 'syntax') loadSyntaxDocs();
   }
 
   // ---------- 编辑器标签页 ----------
@@ -213,7 +221,11 @@
       const out = trace.stdout ? trace.stdout.split('\n').map(esc) : [];
       out.push(`<span class="o-ok">✓ 完成（${dt} ms）</span>`);
       showOutput(out, []);
-      if (state.rightTab === 'circuit' || state.rightTab === 'flowchart') refreshDiagram();
+
+      // 刷新当前视图的图表
+      if (state.rightTab === 'circuit' || state.rightTab === 'flowchart') {
+        refreshDiagram();
+      }
     } catch (e) {
       if (e.name === 'AbortError') return;
       showOutput([`<span class="o-err">运行失败：${esc(e.message)}</span>`], []);
@@ -248,8 +260,10 @@
 
   // ---------- 图表 ----------
   function refreshDiagram() {
-    if (!state.lastTrace) return showDiagramEmpty('请先运行代码');
     if (state.rightTab === 'circuit') {
+      if (!state.lastTrace) {
+        return showDiagramEmpty('请先运行代码');
+      }
       if (!state.lastTrace.registers.length) return showDiagramEmpty('本次运行未使用量子寄存器');
       const regId = 0;
       const xml = QDrawio.circuitXml(state.lastTrace, regId, { theme: state.theme });
@@ -258,9 +272,18 @@
     } else if (state.rightTab === 'flowchart') {
       const tab = state.activeTab;
       if (!tab) return showDiagramEmpty('未打开文件');
-      const prog = LosuParse.parseProgram(tab.code);
-      const xml = QDrawio.flowchartXml(prog, { theme: state.theme, title: tab.name });
-      renderDiagram(xml);
+      if (!tab.code || !tab.code.trim()) return showDiagramEmpty('当前文件为空');
+      try {
+        console.log('正在解析代码生成流程图...');
+        const prog = LosuParse.parseProgram(tab.code);
+        console.log('解析结果:', prog);
+        const xml = QDrawio.flowchartXml(prog, { theme: state.theme, title: tab.name });
+        console.log('生成的 XML 长度:', xml.length);
+        renderDiagram(xml);
+      } catch (e) {
+        console.error('流程图生成失败:', e);
+        showDiagramEmpty('流程图生成失败: ' + e.message);
+      }
     }
   }
 
@@ -274,11 +297,24 @@
 
   function renderDiagram(xml) {
     els.diagramEmpty.style.display = 'none';
-    els.diagramHost.innerHTML = `<div class="mxgraph" style="max-width:100%"></div>`;
-    const cfg = { xml, highlight: '#6aa7ff', nav: false, toolbar: '', lightbox: false, resize: true };
+    els.diagramHost.innerHTML = `<div class="mxgraph" style="max-width:100%;border:1px solid var(--border);"></div>`;
+    const cfg = { xml, highlight: '#6aa7ff', nav: true, toolbar: 'pages zoom layers lightbox', lightbox: false, resize: true, edit: '_blank' };
     const cont = els.diagramHost.querySelector('.mxgraph');
     cont.setAttribute('data-mxgraph', JSON.stringify(cfg));
-    if (typeof GraphViewer !== 'undefined') GraphViewer.processElements();
+
+    // 确保 GraphViewer 已加载
+    if (typeof GraphViewer !== 'undefined') {
+      try {
+        GraphViewer.processElements();
+        console.log('GraphViewer 渲染完成');
+      } catch (e) {
+        console.error('GraphViewer 渲染失败:', e);
+        showDiagramEmpty('渲染失败: ' + e.message);
+      }
+    } else {
+      console.error('GraphViewer 未加载');
+      showDiagramEmpty('GraphViewer 未加载');
+    }
   }
 
   function refreshStepper() {
@@ -289,6 +325,12 @@
     els.stepRange.max = ops.length - 1;
     els.stepRange.value = ops.length - 1;
     updateStep(ops.length - 1);
+
+    // 停止之前的自动播放
+    if (state.autoPlayInterval) {
+      clearInterval(state.autoPlayInterval);
+      state.autoPlayInterval = null;
+    }
   }
 
   function updateStep(idx) {
@@ -306,6 +348,138 @@
       const pct = (a.p * 100).toFixed(1);
       return `<div class="amp-row"><span class="ket">${esc(ket)}</span><div class="amp-bar"><div style="width:${pct}%"></div></div><span class="p">${pct}%</span><span class="a mono">${esc(amp)}</span></div>`;
     }).join('');
+  }
+
+  // ---------- 步进控制 ----------
+  function stepPrev() {
+    const current = Number(els.stepRange.value);
+    if (current > 0) {
+      els.stepRange.value = current - 1;
+      updateStep(current - 1);
+    }
+  }
+
+  function stepNext() {
+    const current = Number(els.stepRange.value);
+    const max = Number(els.stepRange.max);
+    if (current < max) {
+      els.stepRange.value = current + 1;
+      updateStep(current + 1);
+    }
+  }
+
+  function stepTo(idx) {
+    updateStep(Number(idx));
+  }
+
+  function stepPlay() {
+    if (state.autoPlayInterval) {
+      // 停止播放
+      clearInterval(state.autoPlayInterval);
+      state.autoPlayInterval = null;
+      const playBtn = document.getElementById('step-play');
+      if (playBtn) {
+        playBtn.innerHTML = '▶ 播放';
+      }
+      return;
+    }
+
+    // 开始播放
+    const maxStep = Number(els.stepRange.max);
+    if (maxStep === 0) return;
+
+    const playBtn = document.getElementById('step-play');
+    if (playBtn) {
+      playBtn.innerHTML = '⏸ 暂停';
+    }
+
+    state.autoPlayInterval = setInterval(() => {
+      let current = Number(els.stepRange.value);
+      if (current >= maxStep) {
+        current = 0; // 循环播放
+      } else {
+        current++;
+      }
+      els.stepRange.value = current;
+      updateStep(current);
+    }, 800); // 每800ms一步
+  }
+
+  // ---------- 终端初始化 ----------
+  function initTerminal() {
+    const container = $('#terminal-container');
+    if (!container || window.terminalInitialized) return;
+
+    // 动态加载终端
+    const script = document.createElement('script');
+    script.src = 'js/terminal.js';
+    script.onload = () => {
+      if (typeof QTerminal !== 'undefined') {
+        QTerminal.init(container);
+        QTerminal.updateTheme(state.theme);
+        window.terminalInitialized = true;
+      }
+    };
+    document.head.appendChild(script);
+  }
+
+  // ---------- 语法文档加载 ----------
+  async function loadSyntaxDoc() {
+    const contentEl = $('#syntax-content');
+    if (!contentEl || contentEl.dataset.loaded) return;
+
+    try {
+      const resp = await fetch(`${API}/docs/losu-syntax.md`);
+      const markdown = await resp.text();
+
+      // 配置 marked 支持 KaTeX
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({
+          highlight: function(code, lang) {
+            return code; // Monaco 会处理语法高亮
+          },
+          breaks: true
+        });
+
+        let html = marked.parse(markdown);
+
+        // 渲染 LaTeX (内联 $..$ 和块 $$..$$)
+        if (typeof katex !== 'undefined') {
+          // 块级公式
+          html = html.replace(/\$\$([^\$]+)\$\$/g, (match, tex) => {
+            try {
+              return katex.renderToString(tex, { displayMode: true, throwOnError: false });
+            } catch (e) {
+              return match;
+            }
+          });
+          // 内联公式
+          html = html.replace(/\$([^\$]+)\$/g, (match, tex) => {
+            try {
+              return katex.renderToString(tex, { displayMode: false, throwOnError: false });
+            } catch (e) {
+              return match;
+            }
+          });
+        }
+
+        contentEl.innerHTML = html;
+        contentEl.dataset.loaded = 'true';
+      }
+    } catch (e) {
+      contentEl.innerHTML = `<div class="empty-hint">加载语法文档失败: ${esc(e.message)}</div>`;
+    }
+  }
+
+  // ---------- 主题更新终端 ----------
+  function applyTheme(t) {
+    state.theme = t;
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('qlosu_theme', t);
+    if (editor) monaco.editor.setTheme(t === 'light' ? 'vs' : 'vs-dark');
+    if (window.terminalInitialized && typeof QTerminal !== 'undefined') {
+      QTerminal.updateTheme(t);
+    }
   }
 
   // ---------- 工具 ----------
@@ -559,6 +733,172 @@
     }
   }
 
+  // ---------- 语法文档加载 ----------
+  async function loadSyntaxDocs() {
+    const syntaxContent = document.getElementById('syntax-content');
+    if (!syntaxContent) return;
+
+    syntaxContent.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--fg-2)">加载中...</div>';
+
+    try {
+      const response = await fetch(`${API}/docs/losu-syntax.md`);
+      if (!response.ok) throw new Error('无法加载语法文档');
+      const markdown = await response.text();
+
+      if (typeof marked !== 'undefined') {
+        marked.setOptions({
+          highlight: (code, lang) => code,
+          breaks: true,
+          gfm: true,
+        });
+        let html = marked.parse(markdown);
+
+        // 渲染 LaTeX 数学公式
+        if (typeof katex !== 'undefined') {
+          // 块级公式 $$...$$ (必须先处理，避免和行内公式冲突)
+          html = html.replace(/\$\$([^\$]+)\$\$/g, (match, tex) => {
+            try {
+              return katex.renderToString(tex.trim(), { throwOnError: false, displayMode: true });
+            } catch (e) {
+              console.warn('LaTeX 渲染失败:', tex, e);
+              return match;
+            }
+          });
+
+          // 行内公式 $...$
+          html = html.replace(/\$([^\$\n]+)\$/g, (match, tex) => {
+            try {
+              return katex.renderToString(tex.trim(), { throwOnError: false, displayMode: false });
+            } catch (e) {
+              console.warn('LaTeX 渲染失败:', tex, e);
+              return match;
+            }
+          });
+        }
+
+        syntaxContent.innerHTML = html;
+      } else {
+        syntaxContent.innerHTML = '<pre>' + esc(markdown) + '</pre>';
+      }
+    } catch (err) {
+      console.error('加载语法文档失败:', err);
+      syntaxContent.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--error)">加载失败: ' + esc(err.message) + '</div>';
+    }
+  }
+
+  function openSyntaxModal() {
+    const modal = document.getElementById('syntax-modal');
+    if (modal) {
+      modal.style.display = 'flex';
+    }
+  }
+
+  function closeSyntaxModal() {
+    const modal = document.getElementById('syntax-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  // ---------- 面板拖拽调整大小 ----------
+  function initPanelResize() {
+    const sidebar = document.getElementById('sidebar');
+    const center = document.getElementById('center');
+    const rightbar = document.getElementById('rightbar');
+    const panel = document.getElementById('panel');
+    const sashes = document.querySelectorAll('.sash');
+    const sashH = document.querySelector('.sash-h');
+    const resizeHandles = document.querySelectorAll('.resize-handle, .resize-handle-top');
+
+    let dragging = null;
+
+    function doDrag(e) {
+      if (!dragging) return;
+      e.preventDefault();
+
+      if (dragging.type === 'horizontal') {
+        const dx = e.clientX - dragging.startX;
+        if (dragging.element === sidebar) {
+          const newWidth = Math.max(180, Math.min(600, dragging.startWidth + dx));
+          sidebar.style.width = newWidth + 'px';
+        } else if (dragging.element === rightbar) {
+          const newWidth = Math.max(280, Math.min(800, dragging.startWidth - dx));
+          rightbar.style.width = newWidth + 'px';
+        }
+        if (editor) editor.layout();
+      } else if (dragging.type === 'vertical') {
+        const dy = e.clientY - dragging.startY;
+        const newHeight = Math.max(100, Math.min(600, dragging.startHeight - dy));
+        panel.style.height = newHeight + 'px';
+        if (editor) editor.layout();
+        if (window.QTerminal?.instance && document.getElementById('terminal-container').classList.contains('active')) {
+          setTimeout(() => {
+            const fitAddon = window.QTerminal.instance._addonManager?._addons?.find(a => a.instance?.fit);
+            if (fitAddon) fitAddon.instance.fit();
+          }, 100);
+        }
+      }
+    }
+
+    function stopDrag() {
+      if (dragging?.element) {
+        dragging.element.classList.remove('dragging');
+      }
+      dragging = null;
+    }
+
+    // 左右侧边栏拖拽
+    sashes.forEach((sash, idx) => {
+      sash.addEventListener('mousedown', (e) => {
+        const element = idx === 0 ? sidebar : rightbar;
+        dragging = {
+          type: 'horizontal',
+          element,
+          startX: e.clientX,
+          startWidth: element.offsetWidth,
+        };
+        sash.classList.add('dragging');
+        e.preventDefault();
+      });
+    });
+
+    // 底部面板拖拽
+    if (sashH) {
+      sashH.addEventListener('mousedown', (e) => {
+        dragging = {
+          type: 'vertical',
+          element: panel,
+          startY: e.clientY,
+          startHeight: panel.offsetHeight,
+        };
+        sashH.classList.add('dragging');
+        e.preventDefault();
+      });
+    }
+
+    // Resize handles (alternative method)
+    resizeHandles.forEach(handle => {
+      handle.addEventListener('mousedown', (e) => {
+        const parent = handle.closest('#sidebar, #rightbar, #panel');
+        if (!parent) return;
+
+        const isVertical = handle.classList.contains('resize-handle-top');
+        dragging = {
+          type: isVertical ? 'vertical' : 'horizontal',
+          element: parent,
+          startX: e.clientX,
+          startY: e.clientY,
+          startWidth: parent.offsetWidth,
+          startHeight: parent.offsetHeight,
+        };
+        e.preventDefault();
+      });
+    });
+
+    document.addEventListener('mousemove', doDrag);
+    document.addEventListener('mouseup', stopDrag);
+  }
+
   // ---------- 初始化 ----------
   async function init() {
     applyTheme(state.theme);
@@ -605,6 +945,18 @@
       window.addEventListener('resize', () => editor.layout());
       const ver = await fetch(`${API}/api/version`).then((x) => x.json());
       els.sbVersion.textContent = ver.version;
+
+      // 初始化终端
+      if (typeof QTerminal !== 'undefined') {
+        QTerminal.init();
+      }
+
+      // 加载语法文档
+      loadSyntaxDocs();
+
+      // 初始化 resize 功能
+      initPanelResize();
+
       await Promise.all([loadWorkspace(), loadExamples()]);
       if (state.examples.length) openExample(state.examples[0].name);
     });
@@ -631,6 +983,12 @@
     clearAIChat,
     openAISettings,
     saveAIConfig,
+    stepPrev,
+    stepNext,
+    stepTo,
+    stepPlay,
+    openSyntaxModal,
+    closeSyntaxModal,
   };
   window.addEventListener('DOMContentLoaded', init);
 
