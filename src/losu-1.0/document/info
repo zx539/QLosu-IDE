@@ -1,0 +1,13 @@
+{
+    info={
+        name = "document/洛书文档中心",
+        text = "洛书的文档手册，从入门到入坑",
+        version = "24.2.5",
+    },
+    source = {
+        all = {
+        },
+    },
+    type = "const",
+    target = {}
+}

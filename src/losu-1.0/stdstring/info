@@ -1,0 +1,21 @@
+{
+    type = "const",
+    info = {
+        name = "stdstring/标准库(字符串)",
+        text = "stdlib中的字符串函数部分",
+        version = "23.11.10" 
+    },
+    source = {
+        all = {
+            "stdstring.els",
+            "stdstring.h",
+            "stdstring.c"
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"},
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_stdstring.lsd target/ElsLib_stdstring.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdstring.lsd target/ElsLib_stdstring.lsd_Windows ; make clean",
+    }
+}

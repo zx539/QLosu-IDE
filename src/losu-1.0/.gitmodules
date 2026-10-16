@@ -1,0 +1,4 @@
+[submodule "preversion"]
+	url  = https://gitee.com/chen-chaochen/lpk
+	path = preversion
+

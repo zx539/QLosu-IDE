@@ -1,0 +1,9 @@
+.lpkg
+.keygen
+target/
+/buildenv/
+/.repo/release/
+/.repo/tmp/
+/.repo/.index
+/.repo/install.sh
+/losu_core/els_version.h

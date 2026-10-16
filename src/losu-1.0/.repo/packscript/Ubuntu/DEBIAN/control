@@ -1,0 +1,6 @@
+Package: tech.losu
+Maintainer: chen-chaochen
+Depends: rlwrap
+Architecture: amd64
+Priority: optional
+Description: 洛书编程语言 Ubuntu 发行版

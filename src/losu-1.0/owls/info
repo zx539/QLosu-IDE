@@ -1,0 +1,20 @@
+{
+    info = {
+        name = "owls/轻量级wiki建站工具",
+        text = "owls · 基于洛书的wiki建站工具",
+        version = "23.7.3",
+    },
+    source={
+        all={
+            "owls.els",
+            "owls.h",
+            "owls.c",
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"},
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_owls.lsd target/ElsLib_owls.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_owls.lsd target/ElsLib_owls.lsd_Windows ; make clean",
+    }
+}

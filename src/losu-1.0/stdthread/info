@@ -1,0 +1,17 @@
+{
+    type = "const",
+    info = {
+        name = "stdthread/标准库(线程)",
+        text = "stdlib中的线程函数部分",
+        version = "24.1.5" 
+    },
+    source = {
+        all = {"stdthread.els","stdthread.h",},
+        Ubuntu = {"makefile","stdthread.c"},
+        Windows = {"makefile","stdthread.c"},
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_stdthread.lsd target/ElsLib_stdthread.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdthread.lsd target/ElsLib_stdthread.lsd_Windows ; make clean",
+    }
+}

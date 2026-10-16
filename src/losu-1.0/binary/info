@@ -1,0 +1,27 @@
+{
+    info = {
+        name = "binary/轻量级二进制操作模块",
+        text = "一个轻量级二进制操作模块",
+        version = "23.10.1"
+    },
+    source = {
+        all = {
+            "binary.h",
+            "binary.c",
+            "binary.els",
+            "losubinary.h",
+            "losubinary.c",
+            "readme.md"
+        },
+        Ubuntu = {
+            "makefile",
+            },
+        Windows = {
+            "makefile",
+        }
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_binary.lsd target/ElsLib_binary.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_binary.lsd target/ElsLib_binary.lsd_Windows ; make clean",
+    }
+}

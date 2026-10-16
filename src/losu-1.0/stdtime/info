@@ -1,0 +1,17 @@
+{
+    type = "const",
+    info = {
+        name = "stdtime/标准库(时间)",
+        text = "stdlib中的时间函数部分",
+        version = "23.11.30" 
+    },
+    source = {
+        all = {"stdtime.els","stdtime.h","stdtime.c"},
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"},
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_stdtime.lsd target/ElsLib_stdtime.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdtime.lsd target/ElsLib_stdtime.lsd_Windows ; make clean",
+    }
+}

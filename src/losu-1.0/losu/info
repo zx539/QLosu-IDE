@@ -1,0 +1,24 @@
+{
+    type = "const",
+    info = {
+        name = "losu/解释器与REPL",
+        text = "洛书解释器主程序",
+        version = "24.1.28",
+    },
+    source = {
+        all = {
+            "losu.c",
+        },
+        Ubuntu = {
+            "makefile",
+        },
+        Windows = {
+            "makefile",
+            "logo.o"
+        },
+    },
+    target = {
+        Ubuntu = "make;cp losu target/losu_Ubuntu;make clean",
+        Windows  = "make;cp losu.exe target/losu.exe;make clean",
+    }
+}

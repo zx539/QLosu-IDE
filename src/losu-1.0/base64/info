@@ -1,0 +1,23 @@
+{
+    info = {
+        name = "base64/base64编解码模块",
+        text = "base64编解码模块",
+        version = "23.9.1",
+    },
+    source = {
+        all = {
+            "base64.els",
+            "base64.h",
+            "base64.c",
+            "base.c",
+            "base.h",
+            "readme.md",
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"},
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_base64.lsd target/ElsLib_base64.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_base64.lsd target/ElsLib_base64.lsd_Windows ; make clean",
+    }
+}

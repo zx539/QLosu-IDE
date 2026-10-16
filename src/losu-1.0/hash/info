@@ -1,0 +1,29 @@
+{
+    info = {
+        name = "hash/哈希模块",
+        text = "哈希算法模块",
+        version = "23.9.5",
+    },
+    source = {
+        all = {
+            "hash.c",
+            "hash.els",
+            "hash.h",
+            "MD5.c",
+            "MD5.h",
+            "SHA256.c",
+            "SHA256.h",
+            "SHA384.h",
+            "SHA384.c",
+            "SHA512.h",
+            "SHA512.c",
+            "readme.md",
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"},
+    },
+    target={
+        Ubuntu =  "make ; cp ElsLib_hash.lsd target/ElsLib_hash.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_hash.lsd target/ElsLib_hash.lsd_Windows ; make clean",
+    }
+}

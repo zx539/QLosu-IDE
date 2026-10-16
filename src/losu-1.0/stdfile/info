@@ -1,0 +1,24 @@
+{
+    type = "const",
+    info = {
+        name = "stdfile/标准库(文件)",
+        text = "stdlib中的文件函数部分",
+        version = "23.12.1" 
+    },
+    source = {
+        all = {
+            "stdfile.els",
+            "stdfile.h"
+        },
+        Ubuntu  = {
+            "stdfile.c","makefile"
+        },
+        Windows = {
+            "stdfile.c","makefile"
+        },
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_stdfile.lsd target/ElsLib_stdfile.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdfile.lsd target/ElsLib_stdfile.lsd_Windows ; make clean",
+    }
+}

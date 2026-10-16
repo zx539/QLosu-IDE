@@ -1,0 +1,25 @@
+{
+    type = "const",
+    info={
+        name="stdbyte/标准库(Byte操作)",
+        text="标准库 stdlib 的一部分,Byte类型操作部分",
+        version = "24.1.1",
+    },
+    source={
+        all = {
+            "stdbyte.c",
+            "stdbyte.els",
+            "stdbyte.h",
+        },
+        Ubuntu = {
+            "makefile",
+        },
+        Windows = {
+            "makefile",
+        }
+    },
+    target={
+        Ubuntu =  "make ; cp ElsLib_stdbyte.lsd target/ElsLib_stdbyte.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdbyte.lsd target/ElsLib_stdbyte.lsd_Windows ; make clean",
+    }
+}

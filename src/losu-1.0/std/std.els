@@ -1,0 +1,32 @@
+#!declare
+print( s:str , ... ) : null             '打印并换行'
+printl( s:str , ... ) : null            '打印但不换行'
+input( i:[int/null] ) : str             '输入 i 组数据'
+lineinput( i:[int/null] ) : str         '输入 i 行'
+sleep( ms:int ) : null                  '等待毫秒'
+eval( v:str , mod:[int/null] ) : int    '解释字符串,mod不为空时解释文件' 
+val( s:[num/str] ) : num                '转换为数字'
+int( s:[num/str] ) : int                '转换为整数'
+str( n:[num/str] ) : str                '转换为字符串'
+type( o:any ) : str                     '返回参数的数据类型'
+exit( x:int ) : null                    '退出并返回x'
+char(i:int): str                        '返回 i 对应的字符'
+asc(c:str): int                         '返回 c 对应的 ASCII 码'
+getversion(): str                       '获取版本信息'
+#!end
+#!script-cn
+打印 = print
+打印一行 = printl
+输入 =  input
+输入一行 =  lineinput
+等待 = sleep
+释 =  eval 
+数值化 = val 
+整数化 =  int 
+字符化 =  str 
+类型 =  type 
+退 =  exit
+字节 = char 
+字码 = asc
+获取版本 = getversion
+#!end

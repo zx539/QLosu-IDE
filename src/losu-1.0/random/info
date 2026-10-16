@@ -1,0 +1,32 @@
+{
+    type = "pre",
+    info = {
+        name = "random/随机数模块",
+        text = "随机数模块",
+        version = "24.2.9"
+    },
+    source = {
+        all = {
+            "crandom.c",
+            "crandom.h",
+            "ELS_random.c",
+            "ELS_random.h",
+            "lc.c",
+            "lc.h",
+            "mt.c",
+            "mt.h",
+            "random.c",
+            "random.els",
+            "random.h",
+            "randtext.c",
+            "randtext.h",
+            "readme.md"
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"}
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_random.lsd target/ElsLib_random.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_random.lsd target/ElsLib_random.lsd_Windows ; make clean",
+    }
+}

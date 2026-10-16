@@ -1,0 +1,54 @@
+#!/bin/owls.wiki.losu.tech
+```
+# stdlib (stdmath)
+#!declare
+# 常量定义
+PI():                   float             #返回π的值
+E():                    float             #返回e的值 
+GAMMA():                float             #返回γ（欧拉常数）的值
+# 标准数学函数
+abs( num )                                #返回数的绝对值
+mod( a, b )                               #返回a mod b的结果
+acos( x )                                 #返回以弧度表示的x的反余弦
+asin( x )                                 #返回以弧度表示的x的反正弦
+atan( x )                                 #返回以弧度表示的x的反正切
+cos( x )                                  #返回x的余弦值
+sin( x )                                  #返回x的正弦值
+tan( x )                                  #返回x的正切值
+exp( x )                                  #返回e的x次幂的值
+log( a, N )                               #返回以a为第N的对数
+ln( N )                                   #返回以e为底，N的对数
+lg( N )                                   #返回以10为底，N的对数
+sqrt( num:number ):     float             #返回num的平方根
+ceil( num:float ):      float             #对num向上取整
+floor( num:float ):     float             #对num向下取整
+round( num:float ):     float             #将小数四舍五入成整数               
+cut( num:float, x:int): float             #截取小数到若干位
+#!end
+
+#!script-cn
+
+圆周率 = PI
+自然常数 = E
+欧拉常数 = GAMMA
+
+绝对值 = abs
+取模 = mod
+反余弦 = acos
+反正弦 = asin
+反正切 = atan
+余弦 = cos
+正弦 = sin
+正切 = tan
+对数 = log
+                                          #exp起名空缺
+                                          #ln起名空缺
+                                          #lg起名空缺
+开平方 = sqrt
+向上取整 = ceil
+向下取整 = floor
+四舍五入 = round
+保留位数 = cut
+
+#!end
+```

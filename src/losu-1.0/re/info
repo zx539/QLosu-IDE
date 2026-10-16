@@ -1,0 +1,28 @@
+{
+    type = "pre",
+    info = {
+        name = "re",
+        text = "正则表达式模块",
+        version = "24.3.10" 
+    },
+    source = {
+        all = { 
+            "cre.c",
+            "cre.h",
+            "cxkit.h",
+            "re.cpp",
+            "re.els",
+            "re.h",
+        },
+        Ubuntu = {
+            "makefile"
+        },
+        Windows = {
+            "makefile"
+        }
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_re.lsd target/ElsLib_re.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_re.lsd target/ElsLib_re.lsd_Windows ; make clean",
+    }
+}

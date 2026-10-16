@@ -1,0 +1,54 @@
+#!script
+import('stdlib')
+owls = {}
+def owls.throw(s):
+    print("[OWLS-ERROR]\t"&s)
+    exit(0)
+;
+
+
+
+# 主函数 Server
+def owls.Server(project,wiki,path):
+    var wwwroot = project.wwwroot
+    var f = file.open(wwwroot&"owls_theme/owls.html",'r')
+    var fin = file.open(wiki,'r')
+    if !fin: owls.throw("找不到文件!") ;
+    if !f : owls.throw("错误的样式模板!") ;
+    var s = ""
+    print("content-type:text/html;charset=utf-8\n\n")
+    with !f.eof():
+        s = f.lineinput()
+        if replace(s," ","") == "###OWLS_WIKI_MENU###":
+            owls.List( project.wiki or {},path or'/') 
+        elif replace(s," ","") == "###OWLS_WIKI_TEXT###":
+            fin.lineinput()
+            with !fin.eof():
+                print(fin.lineinput())
+            ;
+        else 
+            print(s&'\n')
+        ;
+    ;
+    f.close()
+    fin.close()
+
+;
+# List 
+def owls.List(obj,path):
+    for dir,next in obj : 
+        if type(next)=='string':
+            print("<div class='OWLS_WIKI_MENU_FILE'><a href='"&path& next &"'>"&next&"</a></div>")
+        else
+            print("<details><summary>"& dir &"</summary>")
+            owls.List(next,path&dir&'/')
+            print("</details>") 
+        ;
+    ;
+;
+
+
+def owls.start(project,wiki,path):
+    owls.Server(project,wiki,path)
+;
+#!end

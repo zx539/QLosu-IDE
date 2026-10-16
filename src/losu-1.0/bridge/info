@@ -1,0 +1,28 @@
+{
+    type = "normal",
+    info = {
+        name = "bridge",
+        text = "洛书的其他语言接口",
+        version = "24.3.31" 
+    },
+    source = {
+        all = {
+            "info",
+            "bridge.c",
+            "bridge.h",
+            "bridge.els",
+            "demo.els",
+            "lsffi.c",
+            "lsffi.h",
+            "readme.md",
+        },
+        Windows ={
+            "makefile",
+            "lsffi_asm_linux.S",
+            "lsffi_asm_win.S"
+        },
+    },
+    target={
+        Windows = "make ; cp ElsLib_bridge.lsd target/ElsLib_bridge.lsd_Windows ; make clean",
+    }
+}

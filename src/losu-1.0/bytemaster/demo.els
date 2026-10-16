@@ -1,0 +1,6 @@
+import "bytemaster"  
+var a = bytemaster.alloc(32) 
+bytemaster.write(a, 3, "Hello world!")
+var s = byte.tostr(bytemaster.read(null, a, 3, length("Hello world!")))
+print(s) 
+

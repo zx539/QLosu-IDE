@@ -1,0 +1,11 @@
+#!script
+import "std"
+import "stdbyte"
+import "stdfile"
+import "stdmath"
+import "stdstring"
+import "stdsys"
+import "stdthread"
+import "stdtime"
+import "stdvm"
+#!end

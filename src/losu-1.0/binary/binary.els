@@ -1,0 +1,330 @@
+#!declare
+binary_create( size:int ): ptr                                        #创建一块二进制储存区，返回对应的指针，size的单位是字节
+binary_free( p:ptr ): null                                            #释放一块二进制储存区的内存
+binary_writef( p:ptr, fname:str, n:int): [int/null]                   #向文件写入二进制数据，fname是文件名，mode是"r"、"w"、"a"的其中一个
+binary_writem( p:ptr, m:ptr, len:int ): [int/null]                    #向内存写入指定数量的字节
+binary_readf( p:ptr, fname:str, len:int): [int/null]                  #从文件读取指定数量的字节
+binary_readm( p:ptr, m:ptr, len:int ): [int/null]                     #从内存读取指定数量的字节
+binary_get( p:ptr, i:int ): [int/null]                                #获取储存区中指定位置的数据
+binary_insert( p:ptr, i:int, d:int, size:int): [int/null]             #将指定数据写入储存区的指定位置, size为要写入的数据的大小，单位为字节
+binary_insertp( a:ptr, i:int, p:int, size:int): [int/null]    
+binary_cat( a:ptr, b:ptr ): ptr                                       #将b附加到a末尾
+binary_replace( a:ptr, b:ptr, start:int, len:int ): ptr               #从start处开始，将b中的len个字节的数据替换a中的数据，返回修改后a的指针
+binary_length( p:ptr ): int                                           #返回储存区的长度
+binary_change( p:ptr, len:int ): [int/null]                           #改变储存区的大小
+binary_copy( a:ptr, b:ptr ): [int/null]                               #将a中的数据储存到b中
+binary_set( p:ptr, n:int ): [int/null]                                #将储存区中的数据都设置为n
+binary_slice( p:ptr, start:int, end:int ): ptr                        #将储存区切片
+binary_print(): int
+binary_printf( p:ptr, fname:str): int
+binary_prints( p:ptr ): str
+binary_scans( p:ptr, s:str ): ptr
+
+binary_tounit( p:ptr ): [unit/null]                                   #将二进制储存区中的数据储存到指定的单元中
+binary_fromunit( u:unit ): ptr                                        #将单元中的数据储存到为二进制储存区中
+binary_tostr( p:ptr ): str                                            #将二进制储存区中的数据转化为字符串型
+binary_fromstr( p:ptr, s:str ): [int/null]
+binary_tonum( p:ptr ): unit                                           #将二进制储存区中的数据转化为字符串型
+binary_fromnum( p:ptr, u:unit ): [int/null]
+binary_toptr( p:ptr ): unit                                           #将二进制储存区中的数据转化为字符串型
+binary_fromnum( p:ptr, s:str ): [int/null]
+#!end
+
+#!script
+import("stdlib")
+
+var binary = {}
+
+def binary.create(size):
+    var new = {}
+    size = size or 0
+    
+    if size<=0:
+        new.__ptr__ = null
+    else
+        new.__ptr__ = binary_create(size)
+    ;
+
+    def new.free():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        var p = this.__ptr__
+        this.__ptr__ = null
+        rt binary_free(p)
+    ;
+
+    def new.writef(fname, n):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        if not fname or fname=='':
+            rt null
+        ;
+        mode = mode or 'rb'
+        rt binary_writef(this.__ptr__, fname, n)
+    ;
+
+    def new.writem(p, n):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        if not fname or fname=='':
+            rt null
+        ;
+
+        mode = mode or 'rb'
+        rt binary_writef(this.__ptr__, p, n)
+    ;
+
+    def new.tounit():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_tounit(this.__ptr__)
+    ;
+
+    def new.fromunit(u):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        if not u:
+            rt null
+        ;
+
+        this.__ptr__ = binary_fromunit(this.__ptr__, u)
+        rt this
+    ;
+
+    def new.print():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_print(this.__ptr__)
+    ;
+
+    def new.printfile(fname):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_printf(this.__ptr__, fname)
+    ;
+
+    def new.prints():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_prints(this.__ptr__)
+    ;
+
+    def new.scans(s):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        this.__ptr__ = binary_scans(this.__ptr__, s)
+        rt this
+    ;
+
+    def new.set(n):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_set(this.__ptr__, n)
+    ;
+
+    def new.get(index, size):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        size = int(size or 1)
+        if size<1 or size>8:
+            rt null
+        ;
+
+        rt binary_get(this.__ptr__, index, size)
+    ;
+
+    def new.insert(index, val, size):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        size = int(size or 1)
+        if size > 8 or size < 1:
+            rt null
+        ;
+
+        rt binary_insert(this.__ptr__, index, val, size)
+    ;
+
+    def new.insertp(index, p, size):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        size = int(size or 1)
+        if size < 1:
+            rt null
+        ;
+
+        rt binary_insertp(this.__ptr__, index, p, size)
+    ;
+
+    def new.cat(b):
+        if not this.__ptr__ or not b.__ptr__:
+            rt null
+        ;
+        
+        this.__ptr__ = binary_cat(this.__ptr__, b.__ptr__)
+        rt this
+    ;
+
+    def new.replace(b, start, len):
+        """
+            从start处开始，将b中的len个字节的数据替换a中的数据
+            当b省略时，函数终止运行
+            当start省略时，会被设为0
+            当len省略时，会被设为b的长度
+            返回修改后的本对象
+        """
+        if not a.__ptr__ or not b.__ptr__:
+            rt null
+        ;
+
+        start = start or 0
+        len = len or b.length()
+        this.__ptr__ = binary_replace(this.__ptr__, b.__ptr__, start, len)
+        rt this
+    ;
+
+    def new.writem(p, len):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_writem(this.__ptr__, p, len)
+    ;
+
+    def new.readm(p, len):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        this.__ptr__ = binary_readm(this.__ptr__, p, len)
+        rt this
+    ;
+
+    def new.writef(fname, len):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_writef(this.__ptr__, fname, len)
+    ;
+
+    def new.readf(fname, len):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        this.__ptr__ = binary_readf(this.__ptr__, fname, len)
+        rt this
+    ;
+
+    def new.length():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_length(this.__ptr__)
+    ;
+
+    def new.copy():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        var b = binary.create()
+        b.__ptr__ = binary_copy(this.__ptr__)
+        rt b
+    ;
+
+    def new.change(len):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        this.__ptr__ = binary_change(this.__ptr__, len)
+        rt this
+    ;
+
+    def new.slice(start, end):
+        if not this.__ptr__ or not start or not end:
+            rt null
+        ;
+        var b = binary.create()
+        b.__ptr__ = binary_slice(this.__ptr__, start, end)
+        rt b
+    ;
+
+    def new.tostr():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_tostr(this.__ptr__)
+    ;
+
+    def new.tonum():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_tonum(this.__ptr__)
+    ;
+
+    def new.toptr():
+        if not this.__ptr__:
+            rt null
+        ;
+
+        rt binary_toptr(this.__ptr__)
+    ;
+
+    def new.fromstr(s):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        this.__ptr__ = binary_fromstr(this.__ptr__, s)
+        rt this
+    ;
+
+    def new.fromnum(u):
+        if not this.__ptr__:
+            rt null
+        ;
+
+        this.__ptr__ = binary_fromnum(this.__ptr__, u)
+        rt this
+    ;
+
+    rt new
+;
+
+def binary.valhex(s):
+    rt val(s)
+;
+
+#!end

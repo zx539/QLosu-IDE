@@ -1,0 +1,13 @@
+import "xkit"
+import "bridge"
+
+var lib = xkit.system.sharedlib.load("demo.dll")
+var fp = xkit.system.sharedlib.getprocaddress(lib, "puts")
+
+var n = bridge.c.int32(9)
+xkit.system.io.println(n)
+
+var res = bridge.c.iif(fp, n)
+var res = bridge.c.iif(fp, res)
+
+print("finish..")

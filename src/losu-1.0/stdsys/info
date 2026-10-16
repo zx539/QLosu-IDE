@@ -1,0 +1,17 @@
+{
+    type = "const",
+    info = {
+        name = "stdsys/标准库(系统函数)",
+        text = "stdlib中的系统函数部分",
+        version = "23.10.28" 
+    },
+    source = {
+        all = {"stdsys.els","stdsys.h"},
+        Ubuntu = {"makefile","stdsys.c"},
+        Windows = {"makefile","stdsys.c"},
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_stdsys.lsd target/ElsLib_stdsys.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdsys.lsd target/ElsLib_stdsys.lsd_Windows ; make clean",
+    }
+}

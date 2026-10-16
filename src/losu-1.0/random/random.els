@@ -1,0 +1,24 @@
+#!declare
+
+random_init()
+
+#!end
+
+#!script
+import "stdlib"
+
+random_init()
+random.srand(time.clock())
+
+随机 = {}
+
+随机.获取随机种子 = random.randseed
+随机.改种子 = random.srand
+随机.随机数 = random.random
+随机.随机整数 = random.randint
+随机.随机实数 = random.randfloat
+随机.随机字符串 = random.randstr
+随机.随机字节 = random.randbytes
+随机.百分之 = random.percent
+
+#!end

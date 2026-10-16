@@ -1,0 +1,25 @@
+{
+    info = {
+        name = "lpkg/模块开发者工具",
+        text = "Losu Package ,适合开发者的模块管理工具，支持提交、检出、校验与自动化构建",
+        version = "23.12.26",
+    },
+    source = {
+        all = {
+            "lpkg.els",
+            "lpkg.h",
+            "lpkg.c",
+        },
+        Ubuntu = {
+            "makefile"
+        },
+        Windows = {
+            "makefile"
+        },
+
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_lpkg.lsd target/ElsLib_lpkg.lsd_Ubuntu  ; make clean",
+        Windows = "make; cp ElsLib_lpkg.lsd target/ElsLib_lpkg.lsd_Windows ; make clean"
+    }
+}

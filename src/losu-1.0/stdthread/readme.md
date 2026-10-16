@@ -1,0 +1,43 @@
+#!/bin/owls.wiki.losu.tech
+# stdlib (stdthread)
+```python
+#!declare
+stdthread_create(obj: object,f: def,...): ptr   '''创建一个新线程,调用脚本中的函数 f ,并传递参数'''
+stdthread_exit(): int                           '''退出当前线程'''
+stdthread_join(obj: object): int                '''阻塞至线程结束'''
+stdthread_detach(obj: object): int              '''分离当前线程'''
+stdthread_cancel(obj: object): int              '''终止当前线程'''
+stdthread_self(): pid                           '''返回当前的PID'''
+#!end
+#!script
+thread={}
+def thread.class(): 
+    var this = {}
+    this.create = stdthread_create
+    this.join   = stdthread_join
+    this.detach = stdthread_detach
+    this.exit   = stdthread_exit
+    this.self   = stdthread_self   
+    return this
+;
+thread.cancel = stdthread_cancel
+thread.exit   = stdthread_exit
+#!end
+
+#!script-cn
+线程={}
+def 线程.class():
+    var this = {}
+    this.启动   = stdthread_create
+    this.等待   = stdthread_join
+    this.分离   = stdthread_detach
+    this.退出   = stdthread_exit
+    this.自身ID = stdthread_self
+    return this
+;
+线程.停止 = stdthread_cancel
+线程.退出 = stdthread_exit
+#!end
+
+
+```

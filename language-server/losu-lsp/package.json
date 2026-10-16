@@ -1,0 +1,9 @@
+{
+  "name": "@qlosu/losu-language-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Dependency-free Language Server Protocol implementation for Losu",
+  "engines": { "node": ">=18" },
+  "scripts": { "start": "node server.js", "check": "node --check server.js" },
+  "bin": { "losu-language-server": "server.js" }
+}

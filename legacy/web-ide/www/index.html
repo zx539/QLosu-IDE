@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QLosu 量子编程 IDE</title>
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="/vendor/xterm/css/xterm.css">
+  <link rel="stylesheet" href="/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="/css/markdown.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- 标题栏 -->
+  <div id="titlebar">
+    <div class="brand">
+      <img class="brand-logo" src="/img/LOGO.png" alt="洛书">
+      <span class="brand-name">QLosu</span>
+      <span class="brand-sub">量子编程 IDE</span>
+    </div>
+    <button class="btn" onclick="app.openLocalFile()" title="打开文件 (Ctrl+O)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      打开
+    </button>
+    <button class="btn" onclick="app.run()" title="运行 (Ctrl+Enter)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      运行 <span class="kbd">Ctrl+Enter</span>
+    </button>
+    <button class="btn" onclick="app.saveFile()" title="保存 (Ctrl+S)">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+      保存 <span class="kbd">Ctrl+S</span>
+    </button>
+    <button class="btn" onclick="app.openSyntaxModal()" title="语法手册">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      语法
+    </button>
+    <button class="btn" onclick="app.switchRightTab('circuit')" title="显示右侧栏">侧栏</button>
+    <div class="spacer"></div>
+    <select class="input" onchange="app.applyTheme(this.value)" id="theme-select">
+      <option value="dark">深色主题</option>
+      <option value="light">浅色主题</option>
+      <option value="aurora">极光主题</option>
+    </select>
+  </div>
+
+  <!-- 工作台 -->
+  <div id="workbench">
+    <!-- 活动栏 -->
+    <div id="activitybar">
+      <button class="ab-btn active" data-view="workspace" onclick="app.switchView('workspace')" title="工作区">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
+      </button>
+      <button class="ab-btn" data-view="examples" onclick="app.switchView('examples')" title="示例">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+      </button>
+    </div>
+
+    <!-- 侧边栏 -->
+    <div id="sidebar">
+      <div class="resize-handle"></div>
+      <div class="side-view active" data-view="workspace">
+        <div class="side-head">
+          工作区
+          <div class="spacer"></div>
+          <button class="icon-btn" onclick="app.openLocalFile()" title="打开文件">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="app.openLocalFolder()" title="打开文件夹">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="app.createFile()" title="新建文本">＋</button>
+          <button class="icon-btn" onclick="app.createFolder()" title="新建文件夹">📁</button>
+        </div>
+        <div class="side-body">
+          <div class="ws-root" id="ws-root-text">本地文件（点击上方按钮打开）</div>
+          <div id="ws-tree"></div>
+        </div>
+      </div>
+      <div class="side-view" data-view="examples">
+        <div class="side-head">示例</div>
+        <div class="side-body" id="ex-list"></div>
+      </div>
+    </div>
+
+    <div class="sash"></div>
+
+    <!-- 编辑区 -->
+    <div id="center">
+      <div id="tabs"></div>
+      <div id="editor-host">
+        <div id="editor"></div>
+        <div id="welcome">
+          <div>
+            <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <p>欢迎使用 QLosu 量子编程 IDE</p>
+            <p style="margin-top:6px;font-size:12px">从左侧打开示例或工作区文件开始编程</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sash-h"></div>
+
+      <!-- 面板 -->
+      <div id="panel">
+        <div class="resize-handle-top"></div>
+        <div class="panel-tabs">
+          <button class="ptab active" data-tab="output" onclick="app.switchPanelTab('output')">输出</button>
+          <button class="ptab" data-tab="terminal" onclick="app.switchPanelTab('terminal')">终端</button>
+          <button class="ptab" data-tab="problems" onclick="app.switchPanelTab('problems')">问题<span class="badge" style="display:none">0</span></button>
+        </div>
+        <div class="pview active" id="output"></div>
+        <div class="pview" id="terminal-container"></div>
+        <div class="pview" id="problems"></div>
+      </div>
+    </div>
+
+    <div class="sash"></div>
+
+    <!-- 右侧栏 -->
+    <div id="rightbar">
+      <div class="resize-handle"></div>
+      <div class="right-tabs">
+        <button class="rtab active" data-tab="circuit" onclick="app.switchRightTab('circuit')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
+          量子线路
+        </button>
+        <button class="rtab" data-tab="flowchart" onclick="app.switchRightTab('flowchart')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          程序流程
+        </button>
+        <button class="rtab" data-tab="syntax" onclick="app.switchRightTab('syntax')">
+          <span aria-hidden="true">文</span> 洛书语法
+        </button>
+        <button class="rtab" data-tab="agent" onclick="app.switchRightTab('agent')">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+          AI 助手
+        </button>
+        <button class="icon-btn right-close" onclick="app.switchRightTab('close')" title="关闭右侧栏">×</button>
+      </div>
+
+      <div class="rview active" data-tab="circuit">
+        <div class="rtoolbar">
+          <span class="label">寄存器</span>
+          <select class="input" style="flex:1"><option>寄存器 #0</option></select>
+        </div>
+        <div class="diagram-host"></div>
+        <div class="diagram-empty">请先运行代码</div>
+        <div class="stepper" id="stepper" style="display:none">
+          <button class="btn icon sm" id="step-prev" onclick="app.stepPrev()">◀</button>
+          <button class="btn icon sm" id="step-play" onclick="app.stepPlay()">▶ 播放</button>
+          <button class="btn icon sm" id="step-next" onclick="app.stepNext()">▶</button>
+          <input type="range" id="step-range" min="0" max="0" value="0" oninput="app.stepTo(this.value)">
+          <span id="step-label" style="font-size:12px;white-space:nowrap">步骤 1 / 1</span>
+        </div>
+        <div class="state-view" id="state-view" style="display:none">
+          <div class="state-title" id="state-title"></div>
+          <div id="state-body"></div>
+        </div>
+      </div>
+
+      <div class="rview" data-tab="flowchart">
+        <div class="diagram-host"></div>
+        <div class="diagram-empty">流程图将在运行后显示</div>
+      </div>
+
+      <div class="rview" data-tab="syntax">
+        <div class="rtoolbar syntax-toolbar">
+          <span class="label">洛书语法手册</span>
+          <div class="spacer"></div>
+          <span id="syntax-path" class="syntax-path"></span>
+        </div>
+        <div id="syntax-tabs" class="syntax-tabs"></div>
+        <article id="syntax-content" class="syntax-content"><div class="empty-hint">选择文档开始阅读</div></article>
+      </div>
+
+      <div class="rview" data-tab="agent">
+        <div class="rtoolbar">
+          <span class="label">AI 助手</span>
+          <div class="spacer"></div>
+          <button class="icon-btn" onclick="app.openAISettings()" title="配置 AI">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </button>
+          <button class="icon-btn" onclick="app.clearAIChat()" title="清空对话">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+        <div id="chat">
+          <div class="chat-welcome">
+            <p>👋 你好！我是 QLosu AI 助手，可以帮你：</p>
+            <ul>
+              <li>编写和调试量子算法</li>
+              <li>解释 Losu 语法和量子门操作</li>
+              <li>分析运行错误</li>
+            </ul>
+            <p>快速开始：</p>
+            <div class="chip" onclick="app.sendAIPrompt('如何创建一个2比特的贝尔态？')">创建贝尔态</div>
+            <div class="chip" onclick="app.sendAIPrompt('解释 Grover 算法')">Grover 算法</div>
+            <div class="chip" onclick="app.sendAIPrompt('测量操作怎么用？')">测量操作</div>
+          </div>
+        </div>
+        <div class="composer">
+          <div class="composer-row">
+            <label><input type="checkbox" id="agent-context"> 附带当前代码</label>
+            <div class="spacer"></div>
+            <span id="ai-status" style="font-size:11px;color:var(--text-3)"></span>
+          </div>
+          <textarea id="composer-input" placeholder="向 AI 提问...（Ctrl+Enter 发送）"></textarea>
+          <button class="btn primary" onclick="app.sendAIMessage()" style="align-self:flex-end">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            发送
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 语法手册模态框 -->
+  <div id="syntax-modal" class="modal" style="display:none">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>洛书语法手册</h2>
+        <button class="btn icon" onclick="app.closeSyntaxModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="syntax-modal-content">
+        加载中...
+      </div>
+    </div>
+  </div>
+
+  <!-- 状态栏 -->
+  <div id="statusbar">
+    <div class="sb-item" id="sb-version"></div>
+    <div class="sb-item" id="sb-pos">第 1 行 1 列</div>
+  </div>
+
+  <script>
+    document.getElementById('theme-select').value = localStorage.getItem('qlosu_theme') || 'dark';
+    document.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (document.activeElement === document.getElementById('composer-input')) {
+          app.sendAIMessage();
+        } else {
+          app.run();
+        }
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') { e.preventDefault(); app.saveFile(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'o') { e.preventDefault(); app.openLocalFile(); }
+    });
+    // 拖拽文件打开
+    document.addEventListener('dragover', (e) => { e.preventDefault(); });
+    document.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      const files = Array.from(e.dataTransfer.files);
+      for (const file of files) {
+        if (file.name.endsWith('.losu') || file.name.endsWith('.txt')) {
+          const content = await file.text();
+          app.openTab({ type: 'local', path: file.path || file.name, name: file.name, code: content });
+        }
+      }
+    });
+  </script>
+  <script src="/vendor/xterm/lib/xterm.js"></script>
+  <script src="/vendor/xterm-fit/addon-fit.js"></script>
+  <script src="/vendor/marked/marked.min.js"></script>
+
+  <script src="/vendor/katex/katex.min.js"></script>
+  <script src="/vendor/mermaid/mermaid.min.js"></script>
+  <script src="/js/core/markdown-view.js"></script>
+  <script src="js/core/trace.js"></script>
+  <script src="js/core/losu-parse.js"></script>
+  <script src="js/core/drawio.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/ai-assistant.js"></script>
+  <script src="vendor/monaco/vs/loader.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

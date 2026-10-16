@@ -1,0 +1,17 @@
+#!declare
+
+bytemaster_alloc(length:int)
+bytemaster_write(m:byte, index:int, data:[int/byte/str])
+bytemaster_read(m:byte, index:int, size:int)
+
+#!end
+
+#!script
+
+var bytemaster = {
+    alloc = bytemaster_alloc,
+    write = bytemaster_write,
+    read = bytemaster_read
+}
+
+#!end

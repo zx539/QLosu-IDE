@@ -1,0 +1,25 @@
+{
+    info = {
+        name = "lsmath/数学拓展库",
+        text = "stdmath的拓展模块",
+        version = "23.11.11"
+    },
+    source = {
+        all = {
+            "lsmath.c",
+            "lsmath.h",
+            "lsmath.els",
+            "readme.md"
+        },
+        Ubuntu = {
+            "makefile",
+            },
+        Windows = {
+            "makefile",
+        }
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_lsmath.lsd target/ElsLib_lsmath.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_lsmath.lsd target/ElsLib_lsmath.lsd_Windows ; make clean",
+    }
+}

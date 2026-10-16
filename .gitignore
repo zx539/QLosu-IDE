@@ -1,7 +1,9 @@
 node_modules/
+.cache/
 dist/
 .DS_Store
 *.log
+*.vsix
 .docx-work/
 .vscode/
 .idea/
@@ -10,3 +12,8 @@ dist/
 *~
 .env
 .env.local
+
+.qlosu/
+release-manifest.json
+vendor/node/
+vendor/code-server/

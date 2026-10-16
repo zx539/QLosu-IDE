@@ -1,0 +1,23 @@
+{
+    type = "const",
+    info = {
+        name = "lpt/模块管理工具",
+        text = "洛书模块管理工具",
+        version = "24.1.28" 
+    },
+    source = {
+        all = {
+            "lpt.els","lpt.h",
+        },
+        Windows = {
+            "makefile","lpt.c"
+        },
+        Ubuntu = {
+            "makefile","lpt.c"
+        },
+    },
+    target = {
+        Ubuntu  =  "make ; cp ElsLib_lpt.lsd target/ElsLib_lpt.lsd_Ubuntu   ; make clean",
+        Windows =  "make ; cp ElsLib_lpt.lsd target/ElsLib_lpt.lsd_Windows  ; make clean",
+    }
+}

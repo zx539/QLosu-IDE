@@ -1,0 +1,29 @@
+{
+    info = {
+        name = "lssys/系统拓展库",
+        text = "stdsys的拓展模块",
+        version = "23.10.10"
+    },
+    source = {
+        all = {
+            "lssys.c",
+            "lssys.h",
+            "lssys.els",
+            "readme.md"
+        },
+        Ubuntu = {
+            "makefile",
+            "linux_lssys.h",
+            "linux_lssys.c"
+            },
+        Windows = {
+            "makefile",
+            "win_lssys.h",
+            "win_lssys.c"
+        }
+    },
+    target={
+        Ubuntu =  "make ; cp ElsLib_lssys.lsd target/ElsLib_lssys.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_lssys.lsd target/ElsLib_lssys.lsd_Windows ; make clean",
+    }
+}

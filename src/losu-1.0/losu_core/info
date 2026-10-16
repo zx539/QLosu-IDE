@@ -1,0 +1,37 @@
+{
+    type = "const",
+    info = {
+        name = "losu_core/洛书内核",
+        text = "洛书解释器内核",
+        version="24.2.5"
+    },
+    source = {
+        all ={
+            "els.h", "els_codegen.c", 
+            "els_func.h","els_heap.c",
+            "els_lex.h" ,"els_mem.c",
+            "els_object.h","els_string.c",
+            "els_unit.h","els_vmhost.c",
+            "els_api.c", "els_codegen.h",
+            "els_gc.c","els_heap.h" ,
+            "els_libload.c", "els_mem.h",
+            "els_parser.c","els_string.h",
+            "els_vmcore.c","els_vmhost.h",
+            "els_bytecode.h","els_func.c", 
+            "els_gc.h", "els_lex.c",
+            "els_object.c","els_parser.h",
+            "els_unit.c","els_vmcore.h", "els.c",
+            "els_version.h","els_libload.h"
+        },
+        Ubuntu = {
+            "makefile"
+        },
+        Windows ={
+            "makefile"
+        }
+    },
+    target = {
+        Ubuntu   = "make;cp libeasylosu.so target/libeasylosu.so_Ubuntu;make clean",
+        Windows  = "make;cp libeasylosu.dll target/libeasylosu.dll;cp libeasylosu.dll ../buildenv/libeasylosu.dll;make clean;cp *.h ../buildenv/",
+    }
+}

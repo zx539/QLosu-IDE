@@ -1,0 +1,30 @@
+#!/bin/owls.wiki.losu.tech
+# stdlib (stdstring)
+
+```python
+#!declare
+length(s: str ): int                        '返回 s 的长度'
+strstr(fs: str,ss: str): str                '返回在 fs 中 ss 出现为首的子字符串'
+strtok(fs: str,t: str): str                 '以 s 为标志,在 fs 中分词'
+replace(fs: str,ss: str, obj: str): str     '将 fs 中 的 ss 替换成 obj'
+mid(s: str,sp: int ,len: int): str          '在 s 中 sp 位置 截取 len 长度的字符串'
+reverse(s: str): str                        '倒置 s'
+toupper(s: str): str                        '大写 s'
+tolower(s: str): str                        '小写 s'
+string(s: str,n: int): str                  '将 n 个 fs 拼接为一个长字符串'
+coutnum(fs: str,ss: str): int               '统计 fs 中 ss 出现次数'
+#!end
+#!script-cn
+长度 = length 
+寻至 = strstr
+分词 = strtok
+替换 = replace 
+截取 = mid 
+倒置 = reverse 
+大写 = toupper 
+小写 = tolower 
+抄写 = string
+统计 = coutnum
+#!end
+```
+

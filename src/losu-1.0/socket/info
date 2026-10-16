@@ -1,0 +1,29 @@
+{
+    info = {
+        name = "socket/套接字模块",
+        text = "网络套接字模块",
+        version = "24.4.11"
+    },
+    source = {
+        all = {
+            "socket.c",
+            "socket.h",
+            "socket.els",
+            "readme.md"
+        },
+        Ubuntu = {
+            "makefile",
+            "linux_sock.h",
+            "linux_sock.c",
+            },
+        Windows = {
+            "makefile",
+            "win_sock.h",
+            "win_sock.c"
+        }
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_socket.lsd target/ElsLib_socket.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_socket.lsd target/ElsLib_socket.lsd_Windows ; make clean",
+    }
+}

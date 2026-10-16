@@ -1,0 +1,19 @@
+{
+    type = "const",
+    info = {
+        name = "stdlib/标准库",
+        text = "stdlib接口",
+        version = "23.11.26" 
+    },
+    source = {
+        all ={ 
+            "stdlib.els","stdlib.h","stdlib.c"
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"}
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_stdlib.lsd target/ElsLib_stdlib.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdlib.lsd target/ElsLib_stdlib.lsd_Windows ; make clean",
+    }
+}

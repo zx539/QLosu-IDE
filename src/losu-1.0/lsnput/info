@@ -1,0 +1,30 @@
+{
+    type = "pre",
+    info = {
+        name = "lsnput/键盘鼠标库",
+        text = "为洛书而编写的键盘鼠标控制库",
+        version = "24.2.9"
+    },
+    source = {
+        all = {
+            "lsnput.h",
+            "lsnput.c",
+            "lsnput.els",
+            "readme.md",
+            "ELS_lsnput.h",
+            "ELS_lsnput.c",
+            "lsnput_script.h"
+        },
+        # Ubuntu = {
+        #     "makefile",
+        #     },
+        Windows = {
+            "makefile",
+        }
+    },
+    target = {
+        #Ubuntu =  "make ; cp ElsLib_lsnput.lsd target/ElsLib_lsnput.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_lsnput.lsd target/ElsLib_lsnput.lsd_Windows ; make clean",
+    }
+}
+

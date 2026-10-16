@@ -1,0 +1,225 @@
+{
+  "name": "qlosu-vscode",
+  "displayName": "QLosu Language Support",
+  "description": "洛书语言、量子线路、程序流程图和语法手册支持",
+  "version": "0.1.0",
+  "publisher": "qlosu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qlosu/QLosu-IDE"
+  },
+  "engines": {
+    "vscode": ">=1.85.0"
+  },
+  "main": "extension.js",
+  "icon": "assets/losu-logo.png",
+  "activationEvents": [
+    "onStartupFinished",
+    "onLanguage:losu",
+    "onView:qlosu.workspace",
+    "onView:qlosu.agent",
+    "onCommand:qlosu.runFile",
+    "onCommand:qlosu.openSyntaxManual",
+    "onCommand:qlosu.openAgent",
+    "onCommand:qlosu.toggleWorkbenchMode",
+    "workspaceContains:qlosu.json"
+  ],
+  "categories": [
+    "Programming Languages",
+    "Visualization",
+    "Other"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "losu",
+        "aliases": [
+          "Losu",
+          "洛书"
+        ],
+        "extensions": [
+          ".losu",
+          ".els"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "losu",
+        "scopeName": "source.losu",
+        "path": "./syntaxes/losu.tmLanguage.json"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "qlosu",
+          "title": "洛书",
+          "icon": "assets/losu-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "qlosu": [
+        {
+          "type": "webview",
+          "id": "qlosu.workspace",
+          "name": "洛书工作台"
+        },
+        {
+          "type": "webview",
+          "id": "qlosu.agent",
+          "name": "AI Agent"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "qlosu.runFile",
+        "title": "QLosu: Run Current File"
+      },
+      {
+        "command": "qlosu.generateCircuit",
+        "title": "QLosu: Generate Quantum Circuit"
+      },
+      {
+        "command": "qlosu.generateFlowchart",
+        "title": "QLosu: Generate Program Flowchart"
+      },
+      {
+        "command": "qlosu.openSyntaxManual",
+        "title": "QLosu: Open Losu Syntax Manual"
+      },
+      {
+        "command": "qlosu.selectRuntime",
+        "title": "QLosu: Select Runtime Version"
+      },
+      {
+        "command": "qlosu.openAgent",
+        "title": "QLosu: Open AI Agent"
+      },
+      {
+        "command": "qlosu.toggleWorkbenchMode",
+        "title": "QLosu: Toggle Losu Workbench Mode"
+      },
+      {
+        "command": "qlosu.openTerminal",
+        "title": "QLosu: Open Terminal"
+      },
+      {
+        "command": "qlosu.openUserGuide",
+        "title": "QLosu: Open User Guide"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "qlosu.runFile",
+          "group": "qlosu@1",
+          "when": "editorLangId == losu"
+        },
+        {
+          "command": "qlosu.generateCircuit",
+          "group": "qlosu@2",
+          "when": "editorLangId == losu"
+        },
+        {
+          "command": "qlosu.generateFlowchart",
+          "group": "qlosu@3",
+          "when": "editorLangId == losu"
+        },
+        {
+          "command": "qlosu.openSyntaxManual",
+          "group": "qlosu@4",
+          "when": "editorLangId == losu"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "qlosu.runFile",
+          "group": "qlosu",
+          "when": "editorLangId == losu"
+        },
+        {
+          "command": "qlosu.generateCircuit",
+          "group": "qlosu",
+          "when": "editorLangId == losu"
+        },
+        {
+          "command": "qlosu.generateFlowchart",
+          "group": "qlosu",
+          "when": "editorLangId == losu"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "QLosu",
+      "properties": {
+        "qlosu.serverUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:8080"
+        },
+        "qlosu.languageServer": {
+          "type": "string",
+          "default": ""
+        },
+        "qlosu.syntaxRoot": {
+          "type": "string",
+          "default": "",
+          "description": "可选的语法文档目录（工作区相对路径或绝对路径）；留空使用扩展内置的版本手册。"
+        },
+        "qlosu.runtimeVersion": {
+          "type": "string",
+          "default": "2.0.0",
+          "description": "通过“选择运行时版本”列表选择，运行与量子追踪共同使用此版本。"
+        },
+        "qlosu.workbenchMode": {
+          "type": "boolean",
+          "default": true,
+          "description": "使用洛书默认工作台布局和品牌设置；关闭后恢复标准 VS Code 工作台入口。"
+        },
+        "qlosu.autoFocusWorkbench": {
+          "type": "boolean",
+          "default": true,
+          "description": "启动后聚焦洛书工作台视图。"
+        },
+        "qlosu.agent.provider": {
+          "type": "string",
+          "enum": [
+            "openai",
+            "anthropic"
+          ],
+          "default": "openai",
+          "description": "QLosu Agent 使用的模型协议。Ollama 等 OpenAI 兼容服务选择 openai。"
+        },
+        "qlosu.agent.baseUrl": {
+          "type": "string",
+          "default": "http://127.0.0.1:11434/v1",
+          "description": "模型服务地址，密钥通过 Agent 面板的 SecretStorage 设置。"
+        },
+        "qlosu.agent.model": {
+          "type": "string",
+          "default": "qwen2.5-coder:7b",
+          "description": "Agent 模型名称。"
+        }
+      }
+    }
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "marked": "^11.2.0",
+    "katex": "^0.19.0",
+    "sanitize-html": "2.18.1",
+    "highlight.js": "11.11.1"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^3.2.1"
+  },
+  "scripts": {
+    "package": "vsce package",
+    "vscode:prepublish": "node scripts/prepare.js",
+    "install": "node -e \"console.log('QLosu VS Code extension dependencies installed')\""
+  }
+}

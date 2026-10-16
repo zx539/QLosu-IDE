@@ -1,0 +1,31 @@
+#!declare
+capi_b64encode(s:str)
+capi_b64decode(s:str)
+capi_b64encodep(p:ptr, len:int)
+
+#!end
+
+#!script
+import("stdlib")
+
+base64 = {
+
+}
+
+def base64.encode(s):
+    rt capi_b64encode(s)
+;
+
+def base64.decode(s):
+    rt capi_b64decode(s)
+;
+
+def base64.encodep(p, len):
+    rt capi_b64encodep(p, len)
+;
+
+base64.编码 = base64.encode
+base64.解码 = base64.decodep
+base64.编码指针 = base64.encodep
+
+#!end

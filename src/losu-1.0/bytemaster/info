@@ -1,0 +1,24 @@
+{
+    type = "normal",
+    info = {
+        name = "bytemaster",
+        text = "洛书的byte操作库",
+        version = "24.4.4" 
+    },
+    source = {
+        all = {
+            "info",
+            "bytemaster.c",
+            "bytemaster.h",
+            "bytemaster.els",
+            "demo.els",
+            "readme.md",
+        },
+        Windows ={
+            "makefile",
+        },
+    },
+    target={
+        Windows = "make ; cp ElsLib_bytemaster.lsd target/ElsLib_bytemaster.lsd_Windows ; make clean",
+    }
+}

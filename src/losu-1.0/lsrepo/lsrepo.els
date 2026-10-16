@@ -1,0 +1,189 @@
+#!script
+import "stdlib"
+
+lsrepo = {
+    error = def():; ,
+    init  = def():; ,   # 初始化工作环境
+    add   = def():; ,   # 添加模块
+    rm    = def():; ,   # 删除模块
+    make  = def():; ,   # 构建模块（增量构建）
+    check = def():; ,   # 检测模块是否更改
+    list  = def():; ,   # 列举已经安装的模块
+    thispack = {}   ,   # 模块列表
+}
+
+def lsrepo.error(i):
+    print("[ERROR/错误]: LPKG:\t",i)
+    pass
+
+def lsrepo.init():
+    var s,fin
+    fin = file.open(".repo/.repo",'r')
+    if not fin :
+        lsrepo.error("当前目录下找不到仓库配置网站!")
+        pass
+    
+    with not fin.eof():
+        s = fin.input()
+        if s!="":
+            lsrepo.thispack[s]=s
+            pass
+        pass
+    fin.close() 
+    fin = null
+
+    fin = file.open(".repo/.nosafe",'r')
+    if not fin:
+        return
+        pass
+    with not fin.eof():
+        s = fin.input()
+        if s!="":
+            if lsrepo.thispack[s]:
+                lsrepo.thispack[s]='--xx--'
+                pass
+            pass
+        pass 
+    pass
+
+def lsrepo.add(pack):
+    # 初始化工作环境
+    lsrepo.init()
+
+    lsrepo.thispack[pack]=pack
+    var fout = file.open(".repo/.repo","w")
+    if not fout:
+        lsrepo.error("权限不足,无法打开仓库配置文件!")
+        pass
+    for name,obj in lsrepo.thispack:
+        fout.print(name&"\n")
+        pass
+    fout.close()
+    pass
+
+def lsrepo.rm(pack):
+    # 初始化工作环境
+    lsrepo.init()
+
+    if not lsrepo.thispack[pack]:
+        lsrepo.error("仓库中没有模块 "&pack)
+        pass
+    lsrepo.thispack[pack] = null
+    var fout = file.open(".repo/.repo",'w')
+    if not fout :
+        lsrepo.error("权限不足,无法打开仓库配置文件!")
+        pass
+    for name,obj in lsrepo.thispack:
+        fout.print(name&"\n")
+        pass
+    fout.close()
+    pass
+
+def lsrepo.check(pack):
+    return sys.system("./.repo/.check  "&pack)
+    pass
+
+def lsrepo.make(argv_version,upversion):
+    # 初始化环境
+    var version
+    lsrepo.init()
+
+    var f = file.open(".repo/.index",'w')
+    if not f :
+        lsrepo.error("无法创建 .index 索引文件")
+        pass
+    f.print("Lpt = Lpt or { pkgs = { version='',remote = {}}}\n")
+
+
+    # 获取应有的版本号
+    version = (argv_version and ('"'&argv_version&'"'))
+                or         
+                ('"' & (time.year()-2000) & '.' & time.mon() & '.' & int(time.day()/7) & '"')
+            
+                
+    # 写入 els_version.h
+    var fout = file.open("losu_core/els_version.h",'w')
+    if fout:
+        fout.print('#define ELS_CORE_VERSION '&version)
+        fout.close()
+        pass
+    fout = null
+
+    f.print('Lpt.pkgs.version = '&version&'\n')
+    if upversion:
+        f.print('Lpt.pkgs.upversion = "'&upversion&'"\n')
+        pass
+
+    # var fin = file.open(".repo/.version",'r')
+    # if not fin:
+    #     lsrepo.error("找不到版本配置文件 .version")
+    #     pass
+    # f.print('Lpt.pkgs.version = "'&fin.lineinput()&'"\n')
+    # fin.close()
+    # fin = null
+
+    if sys.system("./.repo/.update")!=0:
+        lsrepo.error("更新脚本存在错误!")
+        pass
+    for pack,name in lsrepo.thispack:
+        if  name != '--xx--' and lsrepo.check(pack)!=0 :
+            sys.system("./.repo/.build "&pack)
+            pass
+        # 生成 remote.list
+        f.print("Lpt.pkgs.remote."&pack&"= ")
+        fin = file.open(pack&"/info",'r')
+        if not fin:
+            lsrepo.error("找不到模块配置文件 info")
+            pass
+        with not fin.eof():
+            f.print(fin.lineinput()&"\n")
+            pass
+        fin.close()
+        fin = null
+        pass
+    pass
+
+def lsrepo.list():
+    lsrepo.init()
+    for pack,name in lsrepo.thispack:
+        print(pack)
+        pass
+    pass
+
+
+
+
+
+
+
+def main(argc,argv):
+    if   argc()==1 :
+        if argv(1) == "make":
+            lsrepo.make()
+        elif argv(1)=="list":
+            lsrepo.list()
+            pass
+
+    elif argc()==2:
+        if argv(1)=="add":
+            lsrepo.add(argv(2))
+        elif argv(1)=="rm":
+            lsrepo.rm(argv(2))
+        elif argv(1)=="check":
+            lsrepo.check(argv(2))
+        elif argv(1)=="make":
+            lsrepo.make(argv(2))
+            pass
+    elif argc()==3:
+        if argv(1)=="make":
+            lsrepo.make(argv(2),argv(3))
+            pass
+    else
+        print("LsRepo Tool -- An Powerful Tool for Losu Packages' Server AutoBuild!")
+        pass
+
+    pass
+
+main(argc,argv)
+
+#!end

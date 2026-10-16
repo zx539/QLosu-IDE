@@ -1,0 +1,15 @@
+#!declare
+re_match()
+re_search()
+re_replace()
+#!end
+
+#!script
+
+var re = {
+    match = re_match,
+    search = re_search,
+    replace = re_replace
+}
+
+#!end

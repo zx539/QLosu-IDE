@@ -1,0 +1,9 @@
+#!/bin/sh 
+echo "开始下载更新包"
+wget --no-check-certificate -q --show-progress https://losu.tech/archive/lasted/.repo/release/losu_Ubuntu.deb -O /tmp/losu_tmp.deb
+# wget --no-check-certificate -q --show-progress http://127.0.0.1:8000/.repo/release/losu_Ubuntu.deb -O /tmp/losu_tmp.deb
+echo "开始安装......"
+sudo dpkg -i /tmp/losu_tmp.deb
+sudo rm /tmp/losu_tmp.deb
+sudo rm /bin/lsupdate
+echo "完成"

@@ -1,0 +1,100 @@
+#!declare
+lsnput_init()
+#!end
+
+#!script
+
+import "stdlib"
+
+lsnput_init()
+
+lsnput.Mouse = {}
+
+lsnput.Mouse.LEFT = 1
+lsnput.Mouse.RIGHT = 2
+lsnput.Mouse.MID = 4
+lsnput.Mouse.UP = 8
+lsnput.Mouse.DOWN = 16
+
+def lsnput.Mouse.class():
+    """
+        鼠标类的构造函数
+    """
+    var this = {}
+
+    this.where = lsnput.get_mouse_position  #查询鼠标位置
+    this.set = lsnput.set_mouse_position    #设置鼠标位置
+
+    this.click = def(this, mode, t):              #点击鼠标
+        var type
+        var c = 0
+        t = t or 1
+
+        if mode == 'left':
+            type = lsnput.Mouse.LEFT
+        elif mode == 'right':
+            type = lsnput.Mouse.RIGHT
+        elif mode == 'mid':
+            type = lsnput.Mouse.MID
+        else
+            type = lsnput.Mouse.LEFT
+        ;
+
+        with 1:
+            c = c + 1
+            
+            if c > t:
+                break
+            ;
+
+            lsnput.click(type)
+        ;
+
+    ;
+
+    rt this
+;
+
+令 键鼠事件 = {}
+
+键鼠事件.鼠标 = {}
+
+方法 键鼠事件.鼠标.class():
+    """
+        鼠标类的构造函数
+    """
+    var this = {}
+
+    this.位置 = lsnput.get_mouse_position  #查询鼠标位置
+    this.设置 = lsnput.set_mouse_position    #设置鼠标位置
+
+    this.点击 = def(this, mode, t):              #点击鼠标
+        var type
+        var c = 0
+        t = t or 1
+
+        if mode == 'left':
+            type = lsnput.Mouse.LEFT
+        elif mode == 'right':
+            type = lsnput.Mouse.RIGHT
+        elif mode == 'mid':
+            type = lsnput.Mouse.MID
+        else
+            type = lsnput.Mouse.LEFT
+        ;
+
+        with 1:
+            c = c + 1
+            
+            if c > t:
+                break
+            ;
+
+            lsnput.click(type)
+        ;
+
+    ;
+
+    rt this
+;
+#!end

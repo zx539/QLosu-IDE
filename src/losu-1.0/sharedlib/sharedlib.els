@@ -1,0 +1,19 @@
+#!declare
+
+sharedlib_load()
+sharedlib_unload()
+sharedlib_sys()
+
+#!end
+
+
+#!script
+
+var sharedlib = {
+    load = sharedlib_load,
+    unload = sharedlib_unload,
+    sys = sharedlib_sys
+}
+
+#!end
+

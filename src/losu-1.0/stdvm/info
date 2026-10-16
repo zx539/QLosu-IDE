@@ -1,0 +1,21 @@
+{
+    type = "const",
+    info = {
+        name = "stdvm/标准库(解释器)",
+        text = "stdlib中的解释器模块部分",
+        version = "23.12.20"
+    },
+    source = {
+        all = {
+            "stdvm.els",
+            "stdvm.h",
+            "stdvm.c"
+        },
+        Ubuntu = {"makefile"},
+        Windows = {"makefile"},
+    },
+    target ={
+        Ubuntu =  "make ; cp ElsLib_stdvm.lsd target/ElsLib_stdvm.lsd_Ubuntu  ; make clean",
+        Windows = "make ; cp ElsLib_stdvm.lsd target/ElsLib_stdvm.lsd_Windows ; make clean",
+    }
+}

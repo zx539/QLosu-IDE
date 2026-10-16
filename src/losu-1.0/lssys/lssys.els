@@ -1,0 +1,265 @@
+#!declare
+
+stdsys的函数
+lssys_getos(): str '从内核中获取所在操作系统信息，一般为 Windwos/Linux'
+lssys_getenv(n: str) '获取名称为n的环境变量'
+lssys_system(cmd: str): int '调用一个命令'
+lssys_popen(cmd: str, mod:str): ptr '创建一个管道，mod可取为 r,w'
+lssys_pwrite(p: ptr,s: str): int '向指定管道 p 写入 s'
+lssys_pread(p: ptr, n: int): int '从指定管道 p 读取 n 个字符'
+lssys_pclose(p: ptr): int '关闭一个管道'
+
+lssys新增的
+lssys_getcwd(): str                                                           #获取当前工作目录
+lssys_exsists(path:str): [int/null]                                           #判断路径是否存在
+lssys_mkdir(path:str): [int/null]                                             #创建一个新目录
+lssys_rmdir(path:str): [int/null]                                             #删除一个目录
+lssys_rename(oldname:str, newname:str)                                        #将文件重命名
+lssys_remove(filename:str)                                                    #删除文件
+lssys_getpid(): int                                                           #获取当前进程的id
+lssys_join( a:string, b:string ): string                                      #将a和b以操作系统文件路径分隔符连接
+lssys_chdir( path:s ): [int/null]                                             #改变当前进程的工作目录
+lssys_killp( pid:int, sig:unknow ): [int/null]                                #将sig作为信号发送给进程id为pid的进程
+lssys_lpcount(): int                                                          #返回当前的计算机的逻辑处理器数
+lssys_architecture(): str                                                     #返回当前CPU的架构
+
+//待完成
+lssys_memtotal(): int                                                         #返回操作系统的总物理内存数，单位为字节
+lssys_memfreep(): int                                                         #返回该线程还可用的最大内存，单位为字节
+#!end
+
+#!script
+if not sys:
+    sys={}
+;
+
+def sys.popen(cmd,mod):
+    var this = {}
+
+    this.P = lssys_popen(cmd, mod or 'r')
+
+    if !this.P : return null ;
+
+    def this.write(s):
+        if not ths.P:
+            rt null
+        ;
+        return lssys_pwrite(this.P,s)
+    ;  
+    def this.read(i):
+        if not ths.P:
+            rt null
+        ;
+        return lssys_pread(this.P,i)
+    ;
+    def this.close():
+        if not ths.P:
+            rt null
+        ;
+        var result = lssys_pclose(this.P)
+        this.P = null
+        rt result
+    ;
+
+    return this
+; 
+
+block
+    """
+        在洛书运行时，操作系统就已经确定
+    """
+    var _ = lssys_getos()
+    def sys.getos():
+        rt _
+    ;
+;
+
+def sys.getenv(name):
+    rt lssys_getenv(name)
+;
+
+def sys.system(cmd):
+    rt lssys_system(cmd)
+;
+
+def sys.getcwd():
+    rt lssys_getcwd()
+;
+
+def sys.exsists(path):
+    rt lssys_exsists(path)
+;
+
+def sys.mkdir(path):
+    rt lssys_mkdir(path)
+;
+
+def sys.rmdir(path):
+    rt lssys_rmdir(path)
+;
+
+def sys.rename(old, new):
+    rt lssys_rename(old, new)
+;
+
+def sys.remove(path):
+    rt lssys_remove(path)
+;
+
+def sys.getpid():
+    rt lssys_getpid()
+;
+
+def sys.join(a, b):
+    rt lssys_join(a, b)
+;
+
+def sys.chdir(path):
+    rt lssys_chdir(path)
+;
+
+def sys.killp(pid):
+    rt lssys_killp(pid)
+;
+
+block
+    """
+        闭包
+        在洛书运行时，逻辑处理器的个数就已经确定
+    """
+    var _ = lssys_lpcount()
+    def sys.lpcount():
+        rt _
+    ;
+;
+
+block
+    """
+        闭包
+        在洛书运行时，处理器的架构就已经确定
+    """
+    var _ = lssys_architecture()
+    def sys.architecture():
+        rt _
+    ;
+;
+
+def sys.memtotal():
+    回 lssys_memtotal()
+;
+
+def sys.memfreep():
+    回 lssys_memfreep()
+;
+
+if not 系统:
+ 系统={}
+;
+
+def 系统.新进程(cmd,mod):
+    var this = {}
+
+    this.P = lssys_popen(cmd, mod or 'r')
+
+    if !this.P : return null ;
+
+    def this.写(s):
+        if not this.P:
+            rt null
+        ;
+        return lssys_pwrite(this.P,s)
+    ;  
+    def this.读(i):
+        if not this.P:
+            rt null
+        ;
+        return lssys_pread(this.P,i)
+    ;
+    def this.关闭():
+        if not this.P:
+            rt null
+        ;
+        var result = lssys_pclose(this.P)
+        this.P = null
+        rt result
+    ;
+
+    return this
+; 
+
+代码块
+    令 _ = lssys_getos()
+    方法 系统.操作系统():
+        回 _
+    ;
+;
+
+方法 系统.环境变量(名称):
+    回 lssys_getenv(名称)
+;
+
+方法 系统.调用(命令):
+    回 lssys_system(命令)
+;
+
+方法 系统.工作目录():
+    回 lssys_getcwd()
+;
+
+方法 系统.存在(路径):
+    回 lssys_exsists(路径)
+;
+
+方法 系统.创建目录(路径):
+    回 lssys_mkdir(路径)
+;
+
+方法 系统.删除目录(路径):
+    回 lssys_rmdir(路径)
+;
+
+方法 系统.重命名(旧名, 新名):
+    回 lssys_rename(旧名, 新名)
+;
+
+方法 系统.删除(路径):
+    回 lssys_remove(路径)
+;
+
+方法 系统.获取进程id():
+    回 lssys_getpid()
+;
+
+方法 系统.拼接路径(甲, 乙):
+    回 lssys_join(甲, 乙)
+;
+
+方法 系统.改变工作目录(路径):
+    回 lssys_chdir(路径)
+;
+
+方法 系统.杀死进程(进程id):
+    回 lssys_killp(进程id)
+;
+
+代码块
+    令 _ = lssys_lpcount()
+    方法 系统.逻辑处理器数():
+        回 _
+    ;
+;
+
+代码块
+    令 _ = lssys_architecture()
+    方法 系统.处理器架构():
+        回 _
+    ;
+;
+
+方法 系统.总内存():
+    回 lssys_memtotal()
+;
+
+方法 系统.线程可用内存():
+    回 lssys_memfreep()
+;

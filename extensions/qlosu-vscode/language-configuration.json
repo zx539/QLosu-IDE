@@ -1,0 +1,18 @@
+{
+  "comments": { "lineComment": "//", "blockComment": ["/*", "*/"] },
+  "brackets": [["{", "}"], ["[", "]"], ["(", ")"]],
+  "autoClosingPairs": [
+    { "open": "{", "close": "}" },
+    { "open": "[", "close": "]" },
+    { "open": "(", "close": ")" },
+    { "open": "\"", "close": "\"", "notIn": ["string", "comment"] },
+    { "open": "'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "`", "close": "`", "notIn": ["string", "comment"] }
+  ],
+  "surroundingPairs": [["{", "}"], ["[", "]"], ["(", ")"], ["\"", "\""], ["'", "'"], ["`", "`"]],
+  "indentationRules": {
+    "increaseIndentPattern": "^\\s*(?:(?:if|elif|else|while|until|loop|for|def|func|function|若|否则|当|直到|对于|函数).*[:：]\\s*$|.*\\{\\s*$)",
+    "decreaseIndentPattern": "^\\s*(?:else|elif|否则|结束|end|\\}|\\]).*"
+  },
+  "folding": { "markers": { "start": "^\\s*(?:(?:函数|def|func|function|若|if|否则|else|对于|for|当|while|until|loop).*[:：{]|#region\\b)", "end": "^\\s*(?:结束|end|\\}|#endregion\\b)" } }
+}

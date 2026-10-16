@@ -1,0 +1,45 @@
+#!declare
+
+bridge_c_cint8()
+bridge_c_cint16()
+bridge_c_cint32()
+bridge_c_cint64()
+
+bridge_c_cfloat32()
+bridge_c_cfloat64()
+
+bridge_c_cstr()
+bridge_c_cptr()
+
+bridge_c_iif(...) #int output int arg function
+
+#!end
+
+#!script
+
+var bridge = {
+
+}
+
+bridge.c = {
+    #从洛书数据类型转换到C数据类型
+    int = bridge_c_cint32,
+    int8 = bridge_c_cint8,
+    int16 = bridge_c_cint16,
+    int32 = bridge_c_cint32,
+    int64 = bridge_c_cint64,
+    char = bridge_c_cint8,
+    short = bridge_c_cint16,
+    float32 = bridge_c_cfloat32,
+    float64 = bridge_c_cfloat64,
+    float = bridge_c_cfloat32,
+    double = bridge_c_cfloat64,
+    str = bridge_c_cstr,
+    ptr = bridge_c_cptr,
+
+    #接口函数
+    iif = bridge_c_iif, #int返回值、int参数的函数(int int function)
+}
+
+#!end
+

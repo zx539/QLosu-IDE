@@ -1,0 +1,216 @@
+#!script
+import "stdlib"
+
+var Lpkg={
+    cmd = {
+        cp    = def():;,
+        mkdir = def():;,
+        rm    = def():;,
+    },
+    error = def():;,
+    init = def():;,
+    argv = {
+        show     = def():;,
+        clean    = def():;,
+        make     = def():;,
+        md5sum   = def():;,
+        md5check = def():;,
+        checkout = def():;,
+        commit   = def():;,
+    },
+    ThisPack = {}
+}
+
+def Lpkg.cmd.cp(src,obj):
+    return sys.system("cp \""&src&"\" \""&obj&"\"") 
+    pass
+
+def Lpkg.cmd.mkdir(dir):
+    return sys.system("mkdir -p \""&dir&"\"")
+    pass
+
+def Lpkg.cmd.rm(f):
+    return sys.system("rm -f \""&f&"\"") 
+    pass
+
+
+def Lpkg.error(s):
+    print("[ERROR/错误]:LPKG:\t",s)
+    exit(1)
+    pass
+
+def Lpkg.init():
+    var fin = file.open("info","r")
+    var s = ""
+    if not fin :
+        Lpkg.error("当前目录下没有模块配置文件!") pass    
+    with not fin.eof():
+        s = s & fin.lineinput() & "\n"
+        pass
+    eval("Lpkg.ThisPack="&s)
+    fin.close()
+    pass
+
+
+def Lpkg.argv.show():
+    print("当前模块信息:")
+    print("包名:\t"&Lpkg.ThisPack.info.name)
+    print("介绍:\t"&Lpkg.ThisPack.info.text)
+    print("版本:\t"&Lpkg.ThisPack.info.version)
+    print("支持的分支:")
+    print("\tall:")
+    for i,f in Lpkg.ThisPack.source.all:
+        print("\t\t",f) 
+        pass
+    for n,b in Lpkg.ThisPack.source :
+        if n != "all": 
+            print("\t",n,':')
+            for i,f in b:
+                print("\t\t",f) pass
+            pass
+        pass
+    pass
+
+def Lpkg.argv.clean():
+    var fin = file.open(".lpkg","r")
+    if not fin: 
+        Lpkg.error("工作区尚未打开分支!") pass
+    var Arch = fin.input()
+    fin.close()
+    # 清空工作区
+    for i,f in Lpkg.ThisPack.source[Arch]:
+        Lpkg.cmd.rm(f) pass
+
+    Lpkg.cmd.rm(".lpkg")
+    pass
+
+def Lpkg.argv.make():
+    var fin = file.open(".lpkg","r")
+    if fin : 
+        Lpkg.error("工作区已经打开分支!") pass 
+    sys.system("mkdir target")
+    for Arch,Script in Lpkg.ThisPack.target:
+        #print("CHECK",Arch)
+        Lpkg.argv.checkout(Arch)
+        sys.system(Script)
+        Lpkg.argv.clean()
+        pass
+    pass
+
+def Lpkg.argv.md5sum():
+    sys.system("> .keygen")
+    sys.system("md5sum info >> .keygen")
+    for arch,obj in Lpkg.ThisPack.source:
+        for i,f in obj:
+            if arch == "all":
+                sys.system("md5sum "&f&" >> .keygen")
+            else
+                sys.system("md5sum "&arch&"/"&f&" >> .keygen") pass
+            pass
+        pass
+    pass
+
+def Lpkg.argv.md5check():
+    if sys.system("md5sum -c .keygen") !=0 : 
+        return 1 pass
+    return 0 pass
+
+def Lpkg.argv.checkout(Arch):
+    var CheckOut_files_exsist,CheckOut_files
+    def CheckOut_files_exsist(f):
+        var fin = file.open(f,"r")
+        if fin :    Lpkg.error("检测到工作区已经存在文件\t"&f&"\t,请清理后重新进行检出") ;
+        pass
+    def CheckOut_files(f):
+        if Lpkg.cmd.cp(Arch&"/"&f,"./"&f) != 0:   Lpkg.error("文件\t"&f&"\t检出失败") ;
+        pass
+
+    if Arch=="all": 
+        Lpkg.error("all 作为通用分支,不能被单独检出!") pass
+    if not Lpkg.ThisPack.source[Arch]: 
+        Lpkg.error("正在尝试检出一个不存在的分支:\t"&Arch) pass
+
+    for i,f in Lpkg.ThisPack.source[Arch] :
+        CheckOut_files_exsist(f)
+        pass
+    for i,f in Lpkg.ThisPack.source[Arch] :
+        CheckOut_files(f)
+        pass
+    
+    var fout = file.open(".lpkg","w")
+    if not fout : 
+        Lpkg.error("检出失败,请检查 lpkg 权限!") pass
+    fout.print(Arch)
+    fout.close()
+    pass
+
+def Lpkg.argv.commit(Arch):
+    var CheckIn_files_exsist,CheckIn_files
+    def CheckIn_files_exsist(f):
+        var fin = file.open(f,"r")
+        if not fin : Lpkg.error("检测到工作区缺少文件\t"&f&"\t,请补齐后重新进行合并") ;
+        fin.close()
+        pass
+    def CheckIn_files(f):
+        return Lpkg.cmd.cp("./"&f,Arch&"/"&f)
+        pass
+
+    if Arch =="all": 
+        Lpkg.error("all 作为通用分支,不能被单独合并!") 
+        pass
+    if not Lpkg.ThisPack.source[Arch]: 
+        Lpkg.error("正在尝试合并一个不存在的分支:\t"&Arch) 
+        pass
+    
+    for i,f in Lpkg.ThisPack.source[Arch] :
+        CheckIn_files_exsist(f) 
+        pass
+
+    Lpkg.cmd.mkdir(Arch)
+
+    for i,f in Lpkg.ThisPack.source[Arch] :
+        CheckIn_files(f) 
+        pass
+    
+    var fout = file.open(".lpkg","w")
+    if not fout : Lpkg.error("检出失败,请检查 lpkg 权限!") ;
+    fout.print(Arch)
+    fout.close()
+    
+    pass
+
+
+def main(argc,argv):
+    if argc() == 1:
+        Lpkg.init()
+        if argv(1)=="show":
+            Lpkg.argv.show()
+        elif argv(1)=="clean":
+            Lpkg.argv.clean()
+        elif argv(1)=="make":
+            Lpkg.argv.make()
+        elif argv(1)=="md5sum":
+            Lpkg.argv.md5sum()
+        elif argv(1)=="md5check":
+            exit(Lpkg.argv.md5check())
+        else
+            Lpkg.error("无效的命令行参数") pass 
+    elif argc()==2:
+        Lpkg.init()
+        if argv(1)=="checkout": 
+            Lpkg.argv.checkout(argv(2))
+        elif argv(1)=="commit":
+            Lpkg.argv.commit(argv(2)) pass
+    else 
+        print("LPKG for Losu v2.x -- An Powerful Tool for Losu Packages")
+        print("洛书模块开发工具 —— V2.0.0")
+        pass
+    
+    pass
+
+main(argc,argv)
+# Lpkg.init()
+# Lpkg.argv.checkout("Ubuntu")
+# Lpkg.argv.clean()
+
+#!end

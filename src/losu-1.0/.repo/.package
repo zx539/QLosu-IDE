@@ -1,0 +1,76 @@
+#!/bin/sh
+sudo rm .repo/release/*
+
+# 打包 Ubuntu 发行版
+
+sudo rm -rf .repo/tmp/*
+sudo cp -r .repo/packscript/Ubuntu/* .repo/tmp/
+sudo mkdir .repo/tmp/lib
+sudo mkdir .repo/tmp/bin
+sudo mkdir .repo/tmp/els
+sudo mkdir .repo/tmp/els/lib
+
+
+sudo chmod 777 .repo/tmp/DEBIAN/control
+sudo echo "Version:$(date +%y).$(date +%m).$(date +%d)" >> .repo/tmp/DEBIAN/control
+# sudo echo "Version:$(date +%y).$(date +%m).$(expr  $(expr $(date +%d) % 7) - 1)" >> .repo/tmp/DEBIAN/control
+
+
+sudo cp losu/target/losu_Ubuntu .repo/tmp/bin/losu
+sudo cp losu_core/target/libeasylosu.so_Ubuntu .repo/tmp/lib/libeasylosu.so
+
+sudo cp std/target/ElsLib_std.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_std.lsd
+sudo cp stdbyte/target/ElsLib_stdbyte.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdbyte.lsd
+sudo cp stdfile/target/ElsLib_stdfile.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdfile.lsd
+sudo cp stdlib/target/ElsLib_stdlib.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdlib.lsd
+sudo cp stdmath/target/ElsLib_stdmath.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdmath.lsd
+sudo cp stdstring/target/ElsLib_stdstring.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdstring.lsd
+sudo cp stdsys/target/ElsLib_stdsys.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdsys.lsd
+sudo cp stdthread/target/ElsLib_stdthread.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdthread.lsd
+sudo cp stdtime/target/ElsLib_stdtime.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdtime.lsd
+sudo cp stdvm/target/ElsLib_stdvm.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_stdvm.lsd
+# sudo cp lsrepo/target/ElsLib_lsrepo.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_lsrepo.lsd
+# sudo cp lpkg/target/ElsLib_lpkg.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_lpkg.lsd
+sudo cp lpt/target/ElsLib_lpt.lsd_Ubuntu .repo/tmp/els/lib/ElsLib_lpt.lsd
+
+
+sudo chmod 755 -R .repo/tmp
+sudo dpkg -b .repo/tmp .repo/release/losu_Ubuntu.deb
+sudo rm -rf .repo/tmp/*
+
+
+
+
+
+
+# 打包 Windows 发行版
+
+sudo rm -rf .repo/tmp/*
+sudo cp -r .repo/packscript/Windows/* .repo/tmp/
+sudo mkdir .repo/tmp/lib
+
+sudo cp losu/target/losu.exe .repo/tmp/losu.exe
+sudo cp losu_core/target/libeasylosu.dll .repo/tmp/libeasylosu.dll
+
+sudo cp std/target/ElsLib_std.lsd_Windows .repo/tmp/lib/ElsLib_std.lsd
+sudo cp stdbyte/target/ElsLib_stdbyte.lsd_Windows .repo/tmp/lib/ElsLib_stdbyte.lsd
+sudo cp stdfile/target/ElsLib_stdfile.lsd_Windows .repo/tmp/lib/ElsLib_stdfile.lsd
+sudo cp stdlib/target/ElsLib_stdlib.lsd_Windows .repo/tmp/lib/ElsLib_stdlib.lsd
+sudo cp stdmath/target/ElsLib_stdmath.lsd_Windows .repo/tmp/lib/ElsLib_stdmath.lsd
+sudo cp stdstring/target/ElsLib_stdstring.lsd_Windows .repo/tmp/lib/ElsLib_stdstring.lsd
+sudo cp stdsys/target/ElsLib_stdsys.lsd_Windows .repo/tmp/lib/ElsLib_stdsys.lsd
+sudo cp stdthread/target/ElsLib_stdthread.lsd_Windows .repo/tmp/lib/ElsLib_stdthread.lsd
+sudo cp stdtime/target/ElsLib_stdtime.lsd_Windows .repo/tmp/lib/ElsLib_stdtime.lsd
+sudo cp stdvm/target/ElsLib_stdvm.lsd_Windows .repo/tmp/lib/ElsLib_stdvm.lsd
+# sudo cp lsrepo/target/ElsLib_lsrepo.lsd_Windows .repo/tmp/lib/ElsLib_lsrepo.lsd
+# sudo cp lpkg/target/ElsLib_lpkg.lsd_Windows .repo/tmp/lib/ElsLib_lpkg.lsd
+sudo cp lpt/target/ElsLib_lpt.lsd_Windows .repo/tmp/lib/ElsLib_lpt.lsd
+
+sudo chmod 0755 -R .repo/tmp
+cd .repo/tmp/
+zip -r ../../.repo/release/losu_Windows.zip * 
+cd ../../
+
+sudo rm -rf .repo/tmp/*
+
+

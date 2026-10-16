@@ -1,0 +1,31 @@
+#!/bin/owls.wiki.losu.tech
+# lpt 模块管理工具 Wiki
+## 简介
+Lpt (Losu Packages Tool)，洛书模块管理工具，是一款轻量高效的跨平台模块管理器，支持模块的下载，安装，查找，升级，卸载，更新，接口胶水生成等多种功能
+## 可用功能
++ 运行方法
+```
+losu -r lpt [参数列表]
+```
+```sh
+lpt help            # 查看帮助文档
+lpt update          # 下载远程列表，检测更新
+lpt upgrade         # 自动化更新
+lpt list            # 列举已安装的模块
+
+
+lpt install [模块名] # 安装模块
+lpt remove  [模块名] # 卸载模块
+lpt autoremove      # 卸载所有被废弃的模块
+
+lpt search  [关键字] # 查找并列举所有相关的模块
+lpt show    [模块]   # 显示模块的详细信息
+lpt wiki    [模块]   # 下载模块的readme文件
+
+lpt source  [模块] [可选/分支]  # 拉取模块源代码
+lpt confsrc [文件]  # 根据脚本文件生成 C/C++ 接口
+lpt confpro [文件]  # 根据工程文件批量生成 C/C++ 接口           
+
+```
+## 使用方法
++ [视频教程]()

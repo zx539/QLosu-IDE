@@ -1,0 +1,13 @@
+OBJS = stdvm.o 
+CFLAGS= -O2   -Wall -std=c99  -DELS_CONF_OS_LINUX   -I ../buildenv -fPIC 
+CC=x86_64-linux-gnu-gcc
+T=./ElsLib_stdvm.lsd
+
+
+all: $T 
+
+$T:	$(OBJS)
+	$(CC) -o $@ $(OBJS)  -shared -s
+
+clean:
+	rm -rf $T $(OBJS)  core core.* 

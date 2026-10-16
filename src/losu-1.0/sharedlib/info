@@ -1,0 +1,21 @@
+{
+    type = "normal",
+    info = {
+        name = "sharedlib",
+        text = "动态库操作模块",
+        version = "24.3.24" 
+    },
+    source = {
+        all = {
+            "info",
+            "sharedlib.c",
+            "sharedlib.h",
+            "sharedlib.els",
+            "readme.md",
+        },
+        Windows ={"makefile"},
+    },
+    target={
+        Windows = "make ; cp ElsLib_sharedlib.lsd target/ElsLib_sharedlib.lsd_Windows ; make clean",
+    }
+}

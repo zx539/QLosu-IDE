@@ -1,0 +1,26 @@
+{
+    type = "const",
+    info={
+        name="std/标准库(IO)",
+        text="标准库 stdlib 的一部分，基本函数部分",
+        version = "23.10.5",
+    },
+    source={
+        all = {
+            "std.els",
+            "std.h",
+        },
+        Ubuntu = {
+            "std.c",
+            "makefile",
+        },
+        Windows = {
+            "std.c",
+            "makefile",
+        }
+    },
+    target={
+        Ubuntu = "make ; cp ElsLib_std.lsd target/ElsLib_std.lsd_Ubuntu ; make clean",
+        Windows = "make ; cp ElsLib_std.lsd target/ElsLib_std.lsd_Windows ; make clean",
+    },
+}

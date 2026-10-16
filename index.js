@@ -20,7 +20,7 @@
  *   GET  /api/fs/*           # 工作区文件读写
  *   POST /api/llm/chat       # 大模型代理（Agent 使用，流式 NDJSON）
  */
-const { startServer } = require('./server/app');
+const { startServer } = require('./apps/server/app');
 
 const PORT = Number(process.env.PORT) || 8080;
 const HOST = process.env.HOST || '127.0.0.1';

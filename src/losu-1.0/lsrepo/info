@@ -1,0 +1,20 @@
+{
+    info = {
+        name = "lsrepo/洛书持续交付工具",
+        text = "洛书持续交付工具，实现远程软件源的持续部署与交付",
+        version = "24.1.28",
+    },
+    source = {
+        all = {
+            "lsrepo.els",
+            "lsrepo.h",
+            "lsrepo.c",
+        },
+        Ubuntu = {
+            "makefile",
+        }
+    },
+    target = {
+        Ubuntu =  "make ; cp ElsLib_lsrepo.lsd target/ElsLib_lsrepo.lsd_Ubuntu  ; make clean",
+    }
+}

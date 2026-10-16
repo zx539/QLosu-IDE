@@ -1,0 +1,30 @@
+# Copy to <workspace>/.continue/config.yaml and set OPENAI_API_KEY in Continue's
+# secret store. Replace the baseUrl and model with the selected provider.
+name: QLosu + OpenAI Compatible
+version: 0.1.0
+schema: v1
+
+models:
+  - name: QLosu OpenAI Compatible
+    provider: openai
+    model: qwen2.5-coder-32b-instruct
+    apiBase: http://127.0.0.1:11434/v1
+    apiKey: ${{ secrets.OPENAI_API_KEY }}
+    roles:
+      - chat
+      - edit
+      - apply
+
+context:
+  - provider: currentFile
+  - provider: code
+  - provider: folder
+  - provider: problems
+  - provider: diff
+  - provider: terminal
+
+systemMessage: |
+  You are the QLosu IDE coding assistant. Treat .losu files as Losu source.
+  Preserve existing quantum semantics and explain changes before applying them.
+  Use qlosu.json, runtime output, diagnostics, and diagram data when available.
+  Never run a terminal command or change a file without the user's confirmation.

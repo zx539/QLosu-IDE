@@ -1,0 +1,64 @@
+{
+  "scopeName": "source.losu",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#declarations" },
+    { "include": "#keywords" },
+    { "include": "#constants" },
+    { "include": "#types" },
+    { "include": "#quantum" },
+    { "include": "#stdlib-functions" },
+    { "include": "#math-functions" },
+    { "include": "#wasm-functions" },
+    { "include": "#ui-functions" },
+    { "include": "#function-calls" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": { "patterns": [
+      { "match": "//.*$", "name": "comment.line.double-slash.losu" },
+      { "match": "#.*$", "name": "comment.line.number-sign.losu" },
+      { "begin": "'''", "end": "'''", "name": "comment.block.triple-single.losu" },
+      { "begin": "\\\"\\\"\\\"", "end": "\\\"\\\"\\\"", "name": "comment.block.triple-double.losu" },
+      { "begin": "/\\*", "end": "\\*/", "name": "comment.block.losu" }
+    ] },
+    "strings": { "patterns": [
+      { "begin": "\\\"", "end": "\\\"", "name": "string.quoted.double.losu", "patterns": [{ "match": "\\\\(?:[abfnrtv\\\\\\\"']|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4})", "name": "constant.character.escape.losu" }] },
+      { "begin": "'", "end": "'", "name": "string.quoted.single.losu", "patterns": [{ "match": "\\\\(?:[abfnrtv\\\\\\\"']|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4})", "name": "constant.character.escape.losu" }] },
+      { "begin": "`", "end": "`", "name": "string.quoted.other.backtick.losu", "patterns": [{ "match": "\\\\.", "name": "constant.character.escape.losu" }] }
+    ] },
+    "numbers": { "patterns": [
+      { "match": "\\b0[xX][0-9A-Fa-f]+\\b", "name": "constant.numeric.hex.losu" },
+      { "match": "\\b0[bB][01]+\\b", "name": "constant.numeric.binary.losu" },
+      { "match": "\\b(?:[0-9]+(?:\\.[0-9]*)?|\\.[0-9]+)(?:[eE][+-]?[0-9]+)?\\b", "name": "constant.numeric.losu" }
+    ] },
+    "declarations": { "patterns": [
+      { "match": "\\b(def|函数|func|function)\\s+([\\p{L}_$][\\p{L}\\p{N}_$]*)", "captures": { "1": { "name": "storage.type.function.losu" }, "2": { "name": "entity.name.function.losu" } } },
+      { "match": "\\b(var|let|const|local)\\s+([\\p{L}_$][\\p{L}\\p{N}_$]*)", "captures": { "1": { "name": "storage.type.variable.losu" }, "2": { "name": "variable.other.readwrite.losu" } } },
+      { "match": "\\b(qreg|qbit|寄存器|量子比特)\\s+([\\p{L}_$][\\p{L}\\p{N}_$]*)", "captures": { "1": { "name": "storage.type.quantum.losu" }, "2": { "name": "variable.other.quantum.losu" } } }
+    ] },
+    "keywords": { "patterns": [
+      { "match": "\\b(if|else|elif|pass|while|until|loop|to|for|in|若|否则|如果|当|直到|循环|对于|遍历)\\b", "name": "keyword.control.losu" },
+      { "match": "\\b(def|函数|func|function|return|break|continue|import|yield|导入|返回|跳出|继续|产出)\\b", "name": "keyword.function.losu" },
+      { "match": "\\b(block|local|var|let|const|async|await|线程|异步)\\b|\\$", "name": "keyword.declaration.losu" },
+      { "match": "\\b(and|or|not|xor|与|或|非)\\b", "name": "keyword.operator.logical.losu" }
+    ] },
+    "constants": { "patterns": [
+      { "match": "\\b(True|False|true|false|null|nil|this|self|arg|main)\\b", "name": "constant.language.losu" },
+      { "match": "\\b(PI|E)\\b", "name": "constant.numeric.math.losu" }
+    ] },
+    "types": { "match": "\\b(Float|String|Int|Number|Bool|Boolean|Func|Unit|Resource|Meta|Thread|QuReg|Qubit|QReg|量子寄存器|量子比特)\\b", "name": "support.type.losu" },
+    "quantum": { "patterns": [
+      { "match": "\\b(H|X|Y|Z|S|T|I|M|U|Rx|Ry|Rz|CNOT|CX|CZ|SWAP|Toffoli|measure|测量)\\b", "name": "support.function.quantum.losu" },
+      { "match": "\\b(amp|phase|probability|state|振幅|相位|概率|量子态)\\b", "name": "support.constant.quantum.losu" }
+    ] },
+    "stdlib-functions": { "match": "\\b(print|println|input|int|float|str|string|len|type|asc|chr|eval|error|assert|range|map|filter|reduce)\\b", "name": "support.function.stdlib.losu" },
+    "math-functions": { "match": "\\b(abs|sqrt|cbrt|pow|exp|log|log2|log10|sin|cos|tan|asin|acos|atan|min|max|floor|ceil|round)\\b", "name": "support.function.math.losu" },
+    "wasm-functions": { "match": "\\b(line|rect|circle|text|triangle|speek|image|sound|time|canvas|color)\\b", "name": "support.function.wasm.losu" },
+    "ui-functions": { "match": "\\b(init|draw|click|mousedown|mouseup|mousemove|keypress|keydown|keyup|resize)\\b", "name": "support.function.ui.losu" },
+    "function-calls": { "match": "\\b[\\p{L}_$][\\p{L}\\p{N}_$]*(?=\\s*\\()", "name": "entity.name.function.call.losu" },
+    "operators": { "match": "\\.\\.|->\\*?|=>|::|:>|~>|==|!=|<=|>=|&&|\\|\\||[+\\-*/%=&|<>!?:~]", "name": "keyword.operator.losu" }
+  }
+}

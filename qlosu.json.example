@@ -1,0 +1,12 @@
+{
+  "losuVersion": "2.0.0",
+  "runtime": "wasm",
+  "runtimes": [
+    {
+      "id": "losu-system",
+      "label": "系统 Losu",
+      "command": "losu",
+      "args": []
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+#!declare
+stdbyte_newbyte_str(o: object,b: str): byte         '生成一个新的二进制变量-从字符串'
+stdbyte_newbyte_num(o: object,b: num): byte         '生成一个新的二进制变量-从数字'
+stdbyte_newbyte_int(o: object,b: num): byte         '生成一个新的二进制变量-从整形'
+stdbyte_tostring(o: object,b:byte): str             '转换为字符串'
+stdbyte_tonumber(o: object,b:byte): number          '转换为数字'
+stdbyte_toint(o:object,b:byte): int                 '转换为整形'
+#!end
+
+#!script
+byte = {
+    bystr   = stdbyte_newbyte_str,
+    bynum   = stdbyte_newbyte_num,
+    byint   = stdbyte_newbyte_int,
+    tostr   = stdbyte_tostring,
+    tonum   = stdbyte_tonumber,
+    toint   = stdbyte_toint,
+}
+#!end
+
+#!script-cn
+二进制 = {
+    创建自 = {
+        字符串 = stdbyte_newbyte_str,
+        数字   = stdbyte_newbyte_num,
+        整型   = stdbyte_newbyte_int,
+    },
+    转换到 = {
+        字符串   = stdbyte_tostring,
+        数字     = stdbyte_tonumber,
+        整型   = stdbyte_toint,
+    }
+    
+}
+#!end

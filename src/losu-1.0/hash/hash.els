@@ -1,0 +1,6 @@
+#!declare
+md5( content:string ): string                   #md5摘要算法接口，接受一个字符串，返回对应的MD5值
+sha256( content:string ): string                #sha256摘要算法接口，接受一个字符串，返回对应的sha256值
+sha384( content:string ): string                #sha384摘要算法接口，接受一个字符串，返回对应的sha384值
+sha512( content:string ): string                #sha512摘要算法接口，接受一个字符串，返回对应的sha512值
+#!end

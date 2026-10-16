@@ -1,0 +1,75 @@
+name: QLosu regression
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm --prefix extensions/qlosu-vscode ci --ignore-scripts
+      - name: Fetch pinned upstream lpk source if absent
+        run: |
+          if [ ! -f src/losu-1.0/losu_core/els.c ]; then
+            git clone https://gitee.com/chen-chaochen/lpk src/losu-1.0
+            git -C src/losu-1.0 checkout d92bc57bb3a4c668821dbc0252b4ea5ef4f7f32c
+          fi
+      - run: npm run losu1:build
+      - run: node extensions/qlosu-vscode/scripts/prepare.js
+      - run: npm run test:all
+      - run: npm run extension:package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qlosu-extension
+          path: extensions/qlosu-vscode/*.vsix
+  linux-workbench:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y xvfb build-essential libx11-dev libxkbfile-dev libsecret-1-dev libkrb5-dev
+      - run: npm ci --ignore-scripts
+      - run: npm --prefix extensions/qlosu-vscode ci --ignore-scripts
+      - name: Fetch pinned upstream lpk source if absent
+        run: |
+          if [ ! -f src/losu-1.0/losu_core/els.c ]; then
+            git clone https://gitee.com/chen-chaochen/lpk src/losu-1.0
+            git -C src/losu-1.0 checkout d92bc57bb3a4c668821dbc0252b4ea5ef4f7f32c
+          fi
+      - run: npm run losu1:build
+      - run: npm run desktop:install
+      - run: npm run code-server:download
+        env:
+          QLOSU_CODE_SERVER_VERIFY_RELEASE: '1'
+      - run: npm run code-server:repair
+      - run: node extensions/qlosu-vscode/scripts/prepare.js
+      - run: npm run test:all
+      - run: npm run smoke:local
+      - run: npm run smoke:workbench
+        env:
+          QLOSU_CHROME_BIN: /usr/bin/google-chrome
+      - run: npm run smoke:markdown
+      - run: xvfb-run -a npm run smoke:desktop
+      - run: npm run dist:linux
+      - run: xvfb-run -a npm run smoke:desktop
+        env:
+          QLOSU_DESKTOP_APP: ${{ github.workspace }}/dist/linux-unpacked/qlosu-standalone
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qlosu-linux
+          path: |
+            dist/QLosu-IDE-*.tar.gz
+            dist/SHA256SUMS
+            release-manifest.json
