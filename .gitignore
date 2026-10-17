@@ -26,6 +26,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 .docx-work/
+.source-docx-work/
+__pycache__/
+*.pyc
+*.o
+*.a
 .vscode/
 .idea/
 *.swp
